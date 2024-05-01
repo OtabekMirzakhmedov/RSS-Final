@@ -26,5 +26,7 @@ module.exports = {
       { allowConstantExport: true },
     ],
     'react/jsx-filename-extension': [1, { extensions: ['.tsx', '.jsx'] }],
+    'react/react-in-jsx-scope': 0,
+    'react/jsx-uses-react': 0
   },
 }
