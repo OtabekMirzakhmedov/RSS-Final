@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { screen, render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import App from './App.tsx';
