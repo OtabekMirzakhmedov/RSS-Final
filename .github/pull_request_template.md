@@ -15,7 +15,9 @@ Please delete options that are not relevant.
 
 # How Has This Been Tested?
 
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
+Please describe the tests if you prepared ones, point out to what features/fixes these tests relate. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration.
+
+Make sure that existing tests pass locally with your new features/fixes.
 
 - [ ] Test A
 - [ ] Test B
@@ -26,7 +28,3 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 - [ ] I have performed a self-review of my code
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published in downstream modules
