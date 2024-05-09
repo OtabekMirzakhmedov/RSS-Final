@@ -26,6 +26,7 @@ Typescript
 Vitest for testing application functionality
 Prettier and Eslint for linting
 Husky
+SCSS
 Material ui
 
 ## Prerequisites
