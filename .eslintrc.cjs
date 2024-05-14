@@ -16,7 +16,11 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:import/recommended',
     'airbnb',
-    'prettier'
+    'prettier',
+    'airbnb-typescript',
+    'airbnb/hooks',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs', 'node_modules'],
   parser: '@typescript-eslint/parser',
@@ -26,7 +30,6 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
-    'react/jsx-filename-extension': [1, { extensions: ['.tsx', '.jsx'] }],
     'react/react-in-jsx-scope': 0,
     'react/jsx-uses-react': 0,
     "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
