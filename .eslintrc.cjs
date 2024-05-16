@@ -32,6 +32,7 @@ module.exports = {
     ],
     'react/react-in-jsx-scope': 0,
     'react/jsx-uses-react': 0,
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+    "linebreak-style": 0,
   },
 }
