@@ -1,0 +1,32 @@
+$form-margin: 100px;
+$form-border-color: rgb(166, 92, 240);
+$link-button-border-color: rgb(166, 92, 240);
+$link-button-hover-background: rgb(214, 198, 229);
+
+.form {
+  margin: $form-margin auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  width: 30%;
+  height: 300px;
+  padding: 40px;
+  border: 2px solid $form-border-color;
+
+  .linkButton {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 2px solid $link-button-border-color;
+    color: #c6bfbf;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+
+    &:hover {
+      background: $link-button-hover-background;
+    }
+  }
+}
