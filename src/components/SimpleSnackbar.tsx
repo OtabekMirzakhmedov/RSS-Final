@@ -22,10 +22,10 @@ export default function SimpleSnackbar({ text, closeModal }: Props) {
 
   const action = (
     <>
-      <Button color='error' size='medium' onClick={handleClose}>
+      <Button color='warning' size='medium' onClick={handleClose}>
         {text}
       </Button>
-      <IconButton size='medium' aria-label='close' color='warning' onClick={handleClose}>
+      <IconButton size='medium' aria-label='close' color='inherit' onClick={handleClose}>
         <CloseIcon fontSize='small' />
       </IconButton>
     </>
@@ -40,7 +40,6 @@ export default function SimpleSnackbar({ text, closeModal }: Props) {
         onClose={handleClose}
         message='Error!'
         action={action}
-        color='blue'
       />
     </div>
   );
