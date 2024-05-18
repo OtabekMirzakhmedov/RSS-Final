@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 interface TokenResponse {
@@ -12,7 +13,6 @@ type InitialTokenResponse = Omit<TokenResponse, 'expires_in' | 'refresh_token'>;
 interface EmailVerifyResponse {
   count: number;
 }
-
 export const getAccessToken = async () => {
   try {
     const authUrl = 'https://auth.eu-central-1.aws.commercetools.com';
