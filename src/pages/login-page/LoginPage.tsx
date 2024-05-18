@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable react/jsx-props-no-spreading */
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button, Link, TextField } from '@mui/material';
@@ -24,6 +25,7 @@ export default function LoginPage() {
   } = useForm<Inputs>({
     mode: 'onChange',
   });
+  const navigate = useNavigate();
   const [emailModalNeeded, setEmailModalNeeded] = useState(false);
   const closeEmailModal = () => {
     setEmailModalNeeded(false);
@@ -46,6 +48,8 @@ export default function LoginPage() {
       setEmailModalNeeded(true);
     } else if (response === 'Wrong password') {
       setPasswordModalNeeded(true);
+    } else {
+      navigate('/');
     }
     reset();
   };
