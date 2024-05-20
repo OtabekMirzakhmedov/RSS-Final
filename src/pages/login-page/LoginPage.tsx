@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable react/jsx-props-no-spreading */
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -49,7 +48,7 @@ export default function LoginPage() {
   const email = watch('email');
   const password = watch('password');
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     const response = await checkEmail(email, password);
 
     if (response === 'This email is not registered') {

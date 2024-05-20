@@ -26,19 +26,24 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['react', 'react-refresh'],
   rules: {
-    'react-refresh/only-export-components': [
-      'warn',
-      { allowConstantExport: true },
+    'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    '@typescript-eslint/no-misused-promises': [
+      2,
+      {
+        checksVoidReturn: {
+          attributes: false,
+        },
+      },
     ],
     'react/react-in-jsx-scope': 0,
     'react/jsx-uses-react': 0,
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
-    "linebreak-style": 0,
-    "prettier/prettier": [
-      "error",
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'linebreak-style': 0,
+    'prettier/prettier': [
+      'error',
       {
-        "endOfLine": "auto"
-      }
-    ]
+        endOfLine: 'auto',
+      },
+    ],
   },
-}
+};
