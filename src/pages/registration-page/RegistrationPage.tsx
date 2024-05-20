@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable react/jsx-props-no-spreading */
 import {
   Avatar,
@@ -19,7 +18,6 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { createAccount, login } from '../../service/AuthenticationService';
 import countries from './RegistrationCountries';
 
@@ -62,12 +60,17 @@ function RegistrationPage() {
   });
 
   const onSubmit = async (data: FormData): Promise<void> => {
-    const response = await createAccount(data);
-    if (axios.isAxiosError(response)) {
-      setError(response.response?.data.message);
-    } else {
-      await login(data.email, data.password);
-      navigate('/');
+    try {
+      const response = await createAccount(data);
+
+      if ('message' in response) {
+        setError(response.message || 'An error occurred.');
+      } else {
+        await login(data.email, data.password);
+        navigate('/');
+      }
+    } catch (err) {
+      setError('An error occurred.');
     }
   };
 
