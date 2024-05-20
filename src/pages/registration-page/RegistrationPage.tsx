@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable react/jsx-props-no-spreading */
 import {
   Avatar,
@@ -33,8 +32,14 @@ interface RegisterField {
   postal: string;
 }
 
+interface FormData {
+  password: string;
+  repeatPassword: string;
+}
+
 function RegistrationPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
   const handleTogglePasswordVisibility = (): void => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
@@ -51,8 +56,13 @@ function RegistrationPage() {
     mode: 'onChange',
   });
 
-  const handleFormSubmit = () => {
-    reset();
+  const onSubmit = async (data: FormData): Promise<void> => {
+    if (data.password !== data.repeatPassword) {
+      setError('The passwords do not match!');
+    } else {
+      setError('');
+      reset();
+    }
   };
 
   const handleLoginClick = (): void => {
@@ -77,7 +87,7 @@ function RegistrationPage() {
           <Typography component='h1' variant='h4' mb={2}>
             Sign up
           </Typography>
-          <form className='form-register' onSubmit={handleSubmit(handleFormSubmit)}>
+          <form className='form-register' onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -253,7 +263,7 @@ function RegistrationPage() {
                       {...params}
                       label='Choose a country'
                       {...register('country', {
-                        required: 'The password is required!',
+                        required: 'The country is required!',
                       })}
                       error={!!errors.country}
                       helperText={errors.country ? errors.country.message : ''}
@@ -271,13 +281,14 @@ function RegistrationPage() {
                   label='Postal Code'
                   variant='outlined'
                   {...register('postal', {
-                    required: 'The password is required!',
+                    required: 'The postal code is required!',
                   })}
                   error={!!errors.postal}
                   helperText={errors.postal ? errors.postal.message : ''}
                 />
               </Grid>
             </Grid>
+            {error && <Typography color='error'>{error}</Typography>}
             <Button type='submit' fullWidth variant='contained' sx={{ mt: 3, mb: 2 }}>
               Sign Up
             </Button>
