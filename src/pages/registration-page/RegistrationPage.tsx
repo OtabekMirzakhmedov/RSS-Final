@@ -19,6 +19,7 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createAccount, login } from '../../service/AuthenticationService';
+import Header from '../../components/header/Header';
 import countries from './RegistrationCountries';
 
 interface RegisterField {
@@ -82,11 +83,12 @@ function RegistrationPage() {
 
   return (
     <div>
+      <Header />
       <Container component='main' maxWidth='xs'>
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 8,
+            marginTop: 3,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',

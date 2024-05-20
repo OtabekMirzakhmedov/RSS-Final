@@ -4,7 +4,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getAccessToken } from '../../service/AuthenticationService';
 import './header.scss';
 
@@ -23,6 +23,8 @@ function Header() {
   const handleRegistrationClick = () => {
     navigate('/create-account');
   };
+
+  const location = useLocation();
 
   const handleLogoutClick = () => {
     localStorage.clear();
@@ -48,13 +50,19 @@ function Header() {
             </Button>
           ) : (
             <>
-              <Button variant='contained' color='success' onClick={handleLoginClick}>
+              <Button
+                variant='contained'
+                color='success'
+                disabled={location.pathname === '/login'}
+                onClick={handleLoginClick}
+              >
                 Login
               </Button>
               <Button
                 variant='outlined'
                 color='inherit'
                 className='registration-button'
+                disabled={location.pathname === '/create-account'}
                 onClick={handleRegistrationClick}
               >
                 Registration
