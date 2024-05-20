@@ -16,6 +16,20 @@ interface TokenResponse {
   refresh_token: string;
 }
 
+interface SignupResponse {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface SignupData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+}
+
 type InitialTokenResponse = Omit<TokenResponse, 'expires_in' | 'refresh_token'>;
 
 interface EmailVerifyResponse {
@@ -122,4 +136,29 @@ export const checkEmail = async (emailAddress: string, password: string) => {
   }
 
   return errorText;
+};
+
+export const createAccount = async (data: SignupData): Promise<SignupResponse | AxiosError> => {
+  let result: SignupResponse | null = null;
+
+  const config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: `${host}/${projectKey}/customers`,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('initial_token')}`,
+    },
+    data,
+  };
+
+  try {
+    const response: AxiosResponse<SignupResponse> = await axios.request(config);
+    result = response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    return axiosError;
+  }
+
+  return result;
 };
