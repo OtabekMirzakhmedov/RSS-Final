@@ -5,7 +5,6 @@ import {
   Button,
   CssBaseline,
   TextField,
-  Link,
   Grid,
   Box,
   Typography,
@@ -19,6 +18,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import countries from './RegistrationCountries';
 
 interface RegisterField {
@@ -36,9 +36,11 @@ interface RegisterField {
 function RegistrationPage() {
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleTogglePasswordVisibility = () => {
+  const handleTogglePasswordVisibility = (): void => {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
+
+  const navigate = useNavigate();
 
   const {
     register,
@@ -51,6 +53,10 @@ function RegistrationPage() {
 
   const handleFormSubmit = () => {
     reset();
+  };
+
+  const handleLoginClick = (): void => {
+    navigate('/login');
   };
 
   return (
@@ -277,9 +283,9 @@ function RegistrationPage() {
             </Button>
             <Grid container justifyContent='flex-end'>
               <Grid item>
-                <Link href='/login' variant='body2'>
+                <Button onClick={handleLoginClick} variant='text' size='small'>
                   Already have an account? Sign in
-                </Link>
+                </Button>
               </Grid>
             </Grid>
           </form>
