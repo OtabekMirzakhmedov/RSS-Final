@@ -8,7 +8,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { checkEmail } from '../../Api';
 import './login.scss';
-import SimpleSnackbar from '../../components/SimpleSnackbar';
+import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 
 interface Inputs {
   email: string;
@@ -26,7 +26,7 @@ export default function LoginPage() {
     mode: 'onChange',
   });
   const navigate = useNavigate();
-  const [emailModalNeeded, setEmailModalNeeded] = useState(false);
+  const [emailModalNeeded, setEmailModalNeeded] = useState<boolean>(false);
   const closeEmailModal = () => {
     setEmailModalNeeded(false);
   };
@@ -50,6 +50,7 @@ export default function LoginPage() {
       setPasswordModalNeeded(true);
     } else {
       navigate('/');
+      localStorage.setItem('initial_token', '');
     }
     reset();
   };
@@ -83,7 +84,7 @@ export default function LoginPage() {
         <TextField
           label='Password'
           style={{
-            minWidth: 375,
+            width: '100%',
             marginBottom: 20,
           }}
           placeholder='Enter your password'
