@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable react/jsx-props-no-spreading */
 import {
   Avatar,
@@ -51,7 +52,6 @@ function RegistrationPage() {
 
   const navigate = useNavigate();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const {
     register,
     handleSubmit,
