@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable react/jsx-props-no-spreading */
 import {
   Avatar,
   Button,
@@ -9,37 +11,46 @@ import {
   Typography,
   Container,
   Autocomplete,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateField } from '@mui/x-date-pickers/DateField';
-import { useState } from 'react';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 import countries from './RegistrationCountries';
 
-const formSchema = z.object({
-  firstName: z.string().min(8, { message: 'Minimum 8 characters' }),
-  lastName: z.string(),
-  email: z.string().email('Email is not correct'),
-  password: z.string().min(8, { message: 'Minimum 8 characters' }),
-  birthday: z.string(),
-  street: z.string(),
-  country: z.string(),
-  postal: z.string(),
-});
+interface RegisterField {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  repeatPassword: string;
+  street: string;
+  city: string;
+  country: string;
+  postal: string;
+}
 
 function RegistrationPage() {
-  const [postalCode, setPostalCode] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const { register } = useForm({
-    resolver: zodResolver(formSchema),
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<RegisterField>({
+    mode: 'onChange',
   });
 
-  const handlePostalCodeChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-    setPostalCode(value);
+  const handleFormSubmit = () => {
+    reset();
   };
 
   return (
@@ -57,72 +68,161 @@ function RegistrationPage() {
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
-          <Typography component='h1' variant='h4'>
+          <Typography component='h1' variant='h4' mb={2}>
             Sign up
           </Typography>
-          <Box component='form' /* onSubmit={handleSubmit(() => {})} */ sx={{ mt: 3 }}>
+          <form className='form-register' onSubmit={handleSubmit(handleFormSubmit)}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  // eslint-disable-next-line react/jsx-props-no-spreading
-                  {...register('firstName')}
                   autoComplete='given-name'
-                  name='firstName'
-                  // required
                   fullWidth
                   id='firstName'
                   label='First Name'
                   autoFocus
+                  {...register('firstName', {
+                    required: 'The name is required!',
+                    minLength: {
+                      value: 1,
+                      message: 'Name: minimum length of 1 character',
+                    },
+                    pattern: {
+                      value: /^[a-zA-Z]+$/,
+                      message:
+                        'The name must not contain numbers or special characters and use english words',
+                    },
+                  })}
+                  type='text'
+                  error={!!errors.firstName}
+                  helperText={errors.firstName ? errors.firstName.message : ''}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  // required
                   fullWidth
                   id='lastName'
                   label='Last Name'
-                  name='lastName'
                   autoComplete='family-name'
+                  {...register('lastName', {
+                    required: 'The last name is required!',
+                    minLength: {
+                      value: 1,
+                      message: 'Last name: minimum length of 1 character',
+                    },
+                    pattern: {
+                      value: /^[a-zA-Z]+$/,
+                      message:
+                        'The last name must not contain numbers or special characters and use english words',
+                    },
+                  })}
+                  type='text'
+                  error={!!errors.lastName}
+                  helperText={errors.lastName ? errors.lastName.message : ''}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  // required
                   fullWidth
                   id='email'
                   label='Email Address'
-                  name='email'
                   autoComplete='email'
+                  {...register('email', {
+                    required: 'The email is required!',
+                    pattern: {
+                      value:
+                        /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
+                      message: 'Please enter a valid email!',
+                    },
+                  })}
+                  type='email'
+                  error={!!errors.email}
+                  helperText={errors.email ? errors.email.message : ''}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  // required
                   fullWidth
-                  name='password'
                   label='Password'
-                  type='password'
+                  type={showPassword ? 'text' : 'password'}
                   id='password'
                   autoComplete='new-password'
+                  {...register('password', {
+                    required: 'The password is required!',
+                    minLength: {
+                      value: 8,
+                      message: 'Password should be at least 8 characters long',
+                    },
+                    pattern: {
+                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/,
+                      message:
+                        'The password must contain at least 1 large letter, 1 small letter and 1 digit',
+                    },
+                  })}
+                  error={!!errors.password}
+                  helperText={errors.password ? errors.password.message : ''}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton onClick={handleTogglePasswordVisibility}>
+                          {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateField fullWidth /*  required  */ label='Birthday' name='birthday' />
-                </LocalizationProvider>
+                <TextField
+                  fullWidth
+                  label='Repeat password'
+                  type='password'
+                  id='repeatPassword'
+                  autoComplete='new-password'
+                  {...register('repeatPassword', {
+                    required: 'The password is required!',
+                  })}
+                  error={!!errors.repeatPassword}
+                  helperText={errors.repeatPassword ? errors.repeatPassword.message : ''}
+                />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  // required
                   fullWidth
-                  name='street'
                   label='Street'
                   type='text'
                   id='street'
+                  {...register('street', {
+                    required: 'The street is required!',
+                    minLength: {
+                      value: 1,
+                      message: 'Name: minimum length of 1 character',
+                    },
+                  })}
+                  error={!!errors.street}
+                  helperText={errors.street ? errors.street.message : ''}
                 />
               </Grid>
               <Grid item xs={12}>
-                {/* <TextField required fullWidth name='city' label='City' type='text' id='city' /> */}
+                <TextField
+                  fullWidth
+                  label='City'
+                  type='text'
+                  id='city'
+                  {...register('city', {
+                    required: 'The city is required!',
+                    minLength: {
+                      value: 1,
+                      message: 'City: minimum length of 1 character',
+                    },
+                    pattern: {
+                      value: /^[a-zA-Z]+$/,
+                      message:
+                        'The city must not contain numbers or special characters and use english words',
+                    },
+                  })}
+                  error={!!errors.city}
+                  helperText={errors.city ? errors.city.message : ''}
+                />
               </Grid>
               <Grid item xs={12}>
                 <Autocomplete
@@ -131,7 +231,6 @@ function RegistrationPage() {
                   autoHighlight
                   getOptionLabel={(option) => option.label}
                   renderOption={(props, option) => (
-                    // eslint-disable-next-line react/jsx-props-no-spreading
                     <Box component='li' sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
                       <img
                         loading='lazy'
@@ -145,13 +244,16 @@ function RegistrationPage() {
                   )}
                   renderInput={(params) => (
                     <TextField
-                      // eslint-disable-next-line react/jsx-props-no-spreading
                       {...params}
                       label='Choose a country'
-                      name='country'
+                      {...register('country', {
+                        required: 'The password is required!',
+                      })}
+                      error={!!errors.country}
+                      helperText={errors.country ? errors.country.message : ''}
                       inputProps={{
                         ...params.inputProps,
-                        autoComplete: 'new-password', // disable autocomplete and autofill
+                        autoComplete: 'new-password',
                       }}
                     />
                   )}
@@ -159,13 +261,14 @@ function RegistrationPage() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  // required
-                  name='postal'
                   fullWidth
                   label='Postal Code'
                   variant='outlined'
-                  value={postalCode}
-                  onChange={handlePostalCodeChange}
+                  {...register('postal', {
+                    required: 'The password is required!',
+                  })}
+                  error={!!errors.postal}
+                  helperText={errors.postal ? errors.postal.message : ''}
                 />
               </Grid>
             </Grid>
@@ -179,7 +282,7 @@ function RegistrationPage() {
                 </Link>
               </Grid>
             </Grid>
-          </Box>
+          </form>
         </Box>
       </Container>
     </div>
