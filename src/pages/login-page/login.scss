@@ -1,6 +1,6 @@
+@import '../../index.scss';
+
 $form-margin: 100px;
-$form-border-color: rgb(166, 92, 240);
-$link-button-border-color: rgb(166, 92, 240);
 $link-button-hover-background: rgb(214, 198, 229);
 
 .form {
@@ -12,12 +12,12 @@ $link-button-hover-background: rgb(214, 198, 229);
   width: 30%;
   height: 300px;
   padding: 40px;
-  border: 2px solid $form-border-color;
+  border: 2px solid $primary-color;
 
   .linkButton {
     display: inline-block;
     padding: 10px 20px;
-    border: 2px solid $link-button-border-color;
+    border: 2px solid $primary-color;
     color: #c6bfbf;
     border-radius: 5px;
     text-decoration: none;
