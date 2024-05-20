@@ -11,7 +11,6 @@ import {
   Autocomplete,
 } from '@mui/material';
 import { z } from 'zod';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { zodResolver } from '@hookform/resolvers/zod';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -35,7 +34,7 @@ const formSchema = z.object({
 function RegistrationPage() {
   const [postalCode, setPostalCode] = useState<string>('');
 
-  const { register, handleSubmit } = useForm({
+  const { register } = useForm({
     resolver: zodResolver(formSchema),
   });
 
@@ -61,7 +60,7 @@ function RegistrationPage() {
           <Typography component='h1' variant='h4'>
             Sign up
           </Typography>
-          <Box component='form' onSubmit={handleSubmit(() => {})} sx={{ mt: 3 }}>
+          <Box component='form' /* onSubmit={handleSubmit(() => {})} */ sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
