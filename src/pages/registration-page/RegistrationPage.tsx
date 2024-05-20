@@ -1,32 +1,44 @@
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Link,
+  Grid,
+  Box,
+  Typography,
+  Container,
+  Autocomplete,
+} from '@mui/material';
+import { z } from 'zod';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { zodResolver } from '@hookform/resolvers/zod';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateField } from '@mui/x-date-pickers/DateField';
-import Autocomplete from '@mui/material/Autocomplete';
 import { useState } from 'react';
-import countries from './RegistrationTypes';
+import { useForm } from 'react-hook-form';
+import countries from './RegistrationCountries';
+
+const formSchema = z.object({
+  firstName: z.string().min(8, { message: 'Minimum 8 characters' }),
+  lastName: z.string(),
+  email: z.string().email('Email is not correct'),
+  password: z.string().min(8, { message: 'Minimum 8 characters' }),
+  birthday: z.string(),
+  street: z.string(),
+  country: z.string(),
+  postal: z.string(),
+});
 
 function RegistrationPage() {
   const [postalCode, setPostalCode] = useState<string>('');
-  const [error, setError] = useState<boolean>(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+  const { register, handleSubmit } = useForm({
+    resolver: zodResolver(formSchema),
+  });
+
   const handlePostalCodeChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
     setPostalCode(value);
   };
@@ -46,16 +58,18 @@ function RegistrationPage() {
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
-          <Typography component='h1' variant='h5'>
+          <Typography component='h1' variant='h4'>
             Sign up
           </Typography>
-          <Box component='form' onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Box component='form' onSubmit={handleSubmit(() => {})} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  // eslint-disable-next-line react/jsx-props-no-spreading
+                  {...register('firstName')}
                   autoComplete='given-name'
                   name='firstName'
-                  required
+                  // required
                   fullWidth
                   id='firstName'
                   label='First Name'
@@ -64,7 +78,7 @@ function RegistrationPage() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  required
+                  // required
                   fullWidth
                   id='lastName'
                   label='Last Name'
@@ -74,7 +88,7 @@ function RegistrationPage() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
+                  // required
                   fullWidth
                   id='email'
                   label='Email Address'
@@ -84,7 +98,7 @@ function RegistrationPage() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
+                  // required
                   fullWidth
                   name='password'
                   label='Password'
@@ -95,12 +109,12 @@ function RegistrationPage() {
               </Grid>
               <Grid item xs={12}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateField fullWidth required label='Birthday' />
+                  <DateField fullWidth /*  required  */ label='Birthday' name='birthday' />
                 </LocalizationProvider>
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
+                  // required
                   fullWidth
                   name='street'
                   label='Street'
@@ -109,15 +123,16 @@ function RegistrationPage() {
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField required fullWidth name='city' label='City' type='text' id='city' />
+                {/* <TextField required fullWidth name='city' label='City' type='text' id='city' /> */}
               </Grid>
               <Grid item xs={12}>
                 <Autocomplete
-                  id='country-select-demo'
+                  id='country-select'
                   options={countries}
                   autoHighlight
                   getOptionLabel={(option) => option.label}
                   renderOption={(props, option) => (
+                    // eslint-disable-next-line react/jsx-props-no-spreading
                     <Box component='li' sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
                       <img
                         loading='lazy'
@@ -131,8 +146,10 @@ function RegistrationPage() {
                   )}
                   renderInput={(params) => (
                     <TextField
+                      // eslint-disable-next-line react/jsx-props-no-spreading
                       {...params}
                       label='Choose a country'
+                      name='country'
                       inputProps={{
                         ...params.inputProps,
                         autoComplete: 'new-password', // disable autocomplete and autofill
@@ -143,14 +160,13 @@ function RegistrationPage() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
+                  // required
+                  name='postal'
                   fullWidth
                   label='Postal Code'
                   variant='outlined'
                   value={postalCode}
                   onChange={handlePostalCodeChange}
-                  error={error}
-                  helperText={error ? 'Пожалуйста, введите корректный почтовый индекс' : ''}
                 />
               </Grid>
             </Grid>
