@@ -18,6 +18,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createAccount, login } from '../../service/AuthenticationService';
 import Header from '../../components/header/Header';
 import countries from './RegistrationCountries';
 
@@ -34,8 +35,10 @@ interface RegisterField {
 }
 
 interface FormData {
+  email: string;
+  firstName: string;
+  lastName: string;
   password: string;
-  repeatPassword: string;
 }
 
 function RegistrationPage() {
@@ -52,23 +55,31 @@ function RegistrationPage() {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
+    watch,
   } = useForm<RegisterField>({
     mode: 'onChange',
   });
 
   const onSubmit = async (data: FormData): Promise<void> => {
-    if (data.password !== data.repeatPassword) {
-      setError('The passwords do not match!');
-    } else {
-      setError('');
-      reset();
+    try {
+      const response = await createAccount(data);
+
+      if ('message' in response) {
+        setError(response.message || 'An error occurred.');
+      } else {
+        await login(data.email, data.password);
+        navigate('/');
+      }
+    } catch (err) {
+      setError('An error occurred.');
     }
   };
 
   const handleLoginClick = (): void => {
     navigate('/login');
   };
+
+  const password = watch('password');
 
   return (
     <div>
@@ -170,11 +181,6 @@ function RegistrationPage() {
                       value: 8,
                       message: 'Password should be at least 8 characters long',
                     },
-                    pattern: {
-                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/,
-                      message:
-                        'The password must contain at least 1 large letter, 1 small letter and 1 digit',
-                    },
                   })}
                   error={!!errors.password}
                   helperText={errors.password ? errors.password.message : ''}
@@ -192,12 +198,13 @@ function RegistrationPage() {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label='Repeat password'
+                  label='Confirm password'
                   type='password'
                   id='repeatPassword'
                   autoComplete='new-password'
                   {...register('repeatPassword', {
                     required: 'The password is required!',
+                    validate: (value) => value === password || 'The passwords do not match!',
                   })}
                   error={!!errors.repeatPassword}
                   helperText={errors.repeatPassword ? errors.repeatPassword.message : ''}
