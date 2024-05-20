@@ -1,8 +1,8 @@
-import * as React from 'react';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { useState } from 'react';
 
 interface Props {
   text: string;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function SimpleSnackbar({ text, closeModal }: Props) {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
 
   const handleClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {

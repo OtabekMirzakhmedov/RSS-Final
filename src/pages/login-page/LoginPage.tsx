@@ -3,12 +3,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Link, TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { checkEmail } from '../../Api';
 import './login.scss';
-import SimpleSnackbar from '../../components/SimpleSnackbar';
+import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 
 interface Inputs {
   email: string;
@@ -26,7 +26,7 @@ export default function LoginPage() {
     mode: 'onChange',
   });
   const navigate = useNavigate();
-  const [emailModalNeeded, setEmailModalNeeded] = useState(false);
+  const [emailModalNeeded, setEmailModalNeeded] = useState<boolean>(false);
   const closeEmailModal = () => {
     setEmailModalNeeded(false);
   };
@@ -50,8 +50,13 @@ export default function LoginPage() {
       setPasswordModalNeeded(true);
     } else {
       navigate('/');
+      localStorage.setItem('initial_token', '');
     }
     reset();
+  };
+
+  const signUpClickHandler = () => {
+    navigate('/create-account');
   };
 
   return (
@@ -79,7 +84,7 @@ export default function LoginPage() {
         <TextField
           label='Password'
           style={{
-            minWidth: 375,
+            width: '100%',
             marginBottom: 20,
           }}
           placeholder='Enter your password'
@@ -129,22 +134,20 @@ export default function LoginPage() {
       <Button size='medium' variant='contained' color='secondary' type='submit'>
         Log in
       </Button>
-      <Link
+      <Button
+        type='button'
+        size='medium'
+        variant='contained'
+        onClick={signUpClickHandler}
         style={{
+          background: 'transparent',
           marginTop: 15,
           color: 'rgb(166, 92, 240)',
-          fontFamily: '"Roboto", "Helvetica", "Arial", "sans-serif"',
-          fontWeight: 500,
-          fontSize: '0.875rem',
-          letterSpacing: '0.02857em',
-          textTransform: 'uppercase',
+          border: '1px solid rgb(166, 92, 240)',
         }}
-        href='/create-account'
-        underline='none'
-        className='linkButton'
       >
         Sign up
-      </Link>
+      </Button>
       <div>
         {emailModalNeeded && (
           <SimpleSnackbar
