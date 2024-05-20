@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { Button, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { checkEmail } from '../../Api';
+import { checkEmail } from '../../service/AuthenticationService';
 import './login.scss';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 
@@ -94,11 +94,6 @@ export default function LoginPage() {
               value: 8,
               message: 'Password must be at least 8 characters long',
             },
-            pattern: {
-              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&](?=[^\s]+$)/,
-              message:
-                'Please enter a password with at least one uppercase letter, one lowercase letter, one digit and one special character, whitespaces not allowed',
-            },
           })}
           type={showPassword ? 'text' : 'password'}
           error={!!errors.password}
@@ -107,7 +102,6 @@ export default function LoginPage() {
               <>
                 {errors.password.type === 'required' && <span>{errors.password.message}</span>}
                 {errors.password.type === 'minLength' && <span>{errors.password.message}</span>}
-                {errors.password.type === 'pattern' && <span>{errors.password.message}</span>}
               </>
             ) : (
               ''
