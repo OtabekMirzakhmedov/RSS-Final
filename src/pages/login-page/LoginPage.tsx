@@ -1,13 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Link, TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { checkEmail } from '../../Api';
+import { checkEmail } from '../../service/AuthenticationService';
 import './login.scss';
-import SimpleSnackbar from '../../components/SimpleSnackbar';
+import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 
 interface Inputs {
   email: string;
@@ -15,6 +15,15 @@ interface Inputs {
 }
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const isLoggedin = localStorage.getItem('token') !== null;
+
+  useEffect(() => {
+    if (isLoggedin) {
+      navigate('/');
+    }
+  }, [isLoggedin, navigate]);
+
   const {
     register,
     handleSubmit,
@@ -24,8 +33,7 @@ export default function LoginPage() {
   } = useForm<Inputs>({
     mode: 'onChange',
   });
-  const navigate = useNavigate();
-  const [emailModalNeeded, setEmailModalNeeded] = useState(false);
+  const [emailModalNeeded, setEmailModalNeeded] = useState<boolean>(false);
   const closeEmailModal = () => {
     setEmailModalNeeded(false);
   };
@@ -49,8 +57,13 @@ export default function LoginPage() {
       setPasswordModalNeeded(true);
     } else {
       navigate('/');
+      localStorage.setItem('initial_token', '');
     }
     reset();
+  };
+
+  const signUpClickHandler = () => {
+    navigate('/create-account');
   };
 
   return (
@@ -78,7 +91,7 @@ export default function LoginPage() {
         <TextField
           label='Password'
           style={{
-            minWidth: 375,
+            width: '100%',
             marginBottom: 20,
           }}
           placeholder='Enter your password'
@@ -88,11 +101,6 @@ export default function LoginPage() {
               value: 8,
               message: 'Password must be at least 8 characters long',
             },
-            pattern: {
-              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&](?=[^\s]+$)/,
-              message:
-                'Please enter a password with at least one uppercase letter, one lowercase letter, one digit and one special character, whitespaces not allowed',
-            },
           })}
           type={showPassword ? 'text' : 'password'}
           error={!!errors.password}
@@ -101,7 +109,6 @@ export default function LoginPage() {
               <>
                 {errors.password.type === 'required' && <span>{errors.password.message}</span>}
                 {errors.password.type === 'minLength' && <span>{errors.password.message}</span>}
-                {errors.password.type === 'pattern' && <span>{errors.password.message}</span>}
               </>
             ) : (
               ''
@@ -128,22 +135,20 @@ export default function LoginPage() {
       <Button size='medium' variant='contained' color='secondary' type='submit'>
         Log in
       </Button>
-      <Link
+      <Button
+        type='button'
+        size='medium'
+        variant='contained'
+        onClick={signUpClickHandler}
         style={{
+          background: 'transparent',
           marginTop: 15,
           color: 'rgb(166, 92, 240)',
-          fontFamily: '"Roboto", "Helvetica", "Arial", "sans-serif"',
-          fontWeight: 500,
-          fontSize: '0.875rem',
-          letterSpacing: '0.02857em',
-          textTransform: 'uppercase',
+          border: '1px solid rgb(166, 92, 240)',
         }}
-        href='/create-account'
-        underline='none'
-        className='linkButton'
       >
         Sign up
-      </Link>
+      </Button>
       <div>
         {emailModalNeeded && (
           <SimpleSnackbar
