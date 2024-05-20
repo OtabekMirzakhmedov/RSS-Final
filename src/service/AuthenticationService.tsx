@@ -1,6 +1,14 @@
 /* eslint-disable no-console */
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
+const projectKey = 'rss-final-commerce';
+const clientSecret = '2LueY3l6v5jSwKM5gaYnEnu0jIYtSoLt';
+const clientId = 'vv_pT9_J_BP03Aa0cqeZfeWD';
+const authUrl = 'https://auth.eu-central-1.aws.commercetools.com';
+const authString = `${clientId}:${clientSecret}`;
+const encodedAuthString = btoa(authString);
+const host = 'https://api.eu-central-1.aws.commercetools.com';
+
 interface TokenResponse {
   access_token: string;
   token_type: string;
@@ -15,13 +23,6 @@ interface EmailVerifyResponse {
 }
 export const getAccessToken = async () => {
   try {
-    const authUrl = 'https://auth.eu-central-1.aws.commercetools.com';
-    const clientId = 'vv_pT9_J_BP03Aa0cqeZfeWD';
-    const clientSecret = '2LueY3l6v5jSwKM5gaYnEnu0jIYtSoLt';
-
-    const authString = `${clientId}:${clientSecret}`;
-    const encodedAuthString = btoa(authString);
-
     const response: AxiosResponse<InitialTokenResponse> = await axios.post<TokenResponse>(
       `${authUrl}/oauth/token`,
       '',
@@ -53,14 +54,6 @@ export const login = async (email: string, password: string) => {
   let result = null;
 
   try {
-    const projectKey = 'rss-final-commerce';
-    const authUrl = 'https://auth.eu-central-1.aws.commercetools.com';
-    const clientId = 'vv_pT9_J_BP03Aa0cqeZfeWD';
-    const clientSecret = '2LueY3l6v5jSwKM5gaYnEnu0jIYtSoLt';
-
-    const authString = `${clientId}:${clientSecret}`;
-    const encodedAuthString = btoa(authString);
-
     const response: AxiosResponse<TokenResponse> = await axios.post<TokenResponse>(
       `${authUrl}/oauth/${projectKey}/customers/token`,
       '',
@@ -97,9 +90,6 @@ export const login = async (email: string, password: string) => {
 export const checkEmail = async (emailAddress: string, password: string) => {
   let errorText = '';
   try {
-    const projectKey = 'rss-final-commerce';
-    const host = 'https://api.eu-central-1.aws.commercetools.com';
-
     const config = {
       body: '',
       headers: {

@@ -18,12 +18,14 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@hookform/resolvers": "^3.4.0",
-    "@mui/x-date-pickers": "^7.5.0",
-    "@types/node": "^20.12.12",
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
+    "@mui/x-date-pickers": "^7.5.0",
+    "@types/node": "^20.12.12",
     "@vitejs/plugin-react": "^4.2.1",
     "axios": "^1.6.8",
+    "dayjs": "^1.11.11",
+    "dotenv": "^16.4.5",
     "eslint-config-airbnb-typescript": "^18.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -53,6 +55,7 @@
     "prettier": "^3.2.5",
     "sass": "^1.77.0",
     "typescript": "^5.4.5",
+    "vite-plugin-env-compatible": "^2.0.1",
     "vitest": "^1.5.3"
   }
 }

@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { Button, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { checkEmail } from '../../Api';
+import { checkEmail } from '../../service/AuthenticationService';
 import './login.scss';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 

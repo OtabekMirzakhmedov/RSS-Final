@@ -3,7 +3,7 @@ import LoginPage from './pages/login-page/LoginPage';
 import RegistrationPage from './pages/registration-page/RegistrationPage';
 import NotFoundPage from './pages/not-found-page/NotFoundPage';
 import MainPage from './pages/main-page/MainPage';
-import { getAccessToken } from './Api';
+import { getAccessToken } from './service/AuthenticationService';
 
 function App() {
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
