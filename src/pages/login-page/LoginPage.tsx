@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable react/jsx-props-no-spreading */
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -16,6 +16,15 @@ interface Inputs {
 }
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const isLoggedin = localStorage.getItem('token') !== null;
+
+  useEffect(() => {
+    if (isLoggedin) {
+      navigate('/');
+    }
+  }, [isLoggedin, navigate]);
+
   const {
     register,
     handleSubmit,
@@ -25,7 +34,6 @@ export default function LoginPage() {
   } = useForm<Inputs>({
     mode: 'onChange',
   });
-  const navigate = useNavigate();
   const [emailModalNeeded, setEmailModalNeeded] = useState<boolean>(false);
   const closeEmailModal = () => {
     setEmailModalNeeded(false);
