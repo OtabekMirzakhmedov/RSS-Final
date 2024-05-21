@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Container, TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { checkEmail } from '../../service/AuthenticationService';
@@ -70,107 +70,111 @@ export default function LoginPage() {
   return (
     <>
       <Header />
-      <Container component='main' maxWidth='xs'>
-        <form className='form' onSubmit={handleSubmit(onSubmit)}>
+      <form className='form' onSubmit={handleSubmit(onSubmit)}>
+        <TextField
+          label='Email'
+          placeholder='Enter your email'
+          style={{
+            marginTop: 40,
+            marginBottom: 20,
+          }}
+          {...register('email', {
+            required: 'The email is required!',
+            pattern: {
+              value:
+                /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
+              message: 'Please enter a valid email!',
+            },
+          })}
+          type='email'
+          error={!!errors.email}
+          helperText={errors.email ? errors.email.message : ''}
+        />
+        <div style={{ position: 'relative' }}>
           <TextField
-            label='Email'
-            placeholder='Enter your email'
+            label='Password'
             style={{
-              marginTop: 40,
+              width: '100%',
               marginBottom: 20,
             }}
-            {...register('email', {
-              required: 'The email is required!',
+            placeholder='Enter your password'
+            {...register('password', {
+              required: 'The password is required!',
+              minLength: {
+                value: 8,
+                message: 'Password must be at least 8 characters long',
+              },
               pattern: {
-                value:
-                  /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
-                message: 'Please enter a valid email!',
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+                message:
+                  'Password should contain at least 1 uppercase letter, 1 lowercase letter, and 1 number',
               },
             })}
-            type='email'
-            error={!!errors.email}
-            helperText={errors.email ? errors.email.message : ''}
+            type={showPassword ? 'text' : 'password'}
+            error={!!errors.password}
+            helperText={
+              errors.password ? (
+                <>
+                  {errors.password.type === 'required' && <span>{errors.password.message}</span>}
+                  {errors.password.type === 'minLength' && <span>{errors.password.message}</span>}
+                  {errors.password.type === 'pattern' && <span>{errors.password.message}</span>}
+                </>
+              ) : (
+                ''
+              )
+            }
           />
-          <div style={{ position: 'relative' }}>
-            <TextField
-              label='Password'
-              style={{
-                width: '100%',
-                marginBottom: 20,
-              }}
-              placeholder='Enter your password'
-              {...register('password', {
-                required: 'The password is required!',
-                minLength: {
-                  value: 8,
-                  message: 'Password must be at least 8 characters long',
-                },
-              })}
-              type={showPassword ? 'text' : 'password'}
-              error={!!errors.password}
-              helperText={
-                errors.password ? (
-                  <>
-                    {errors.password.type === 'required' && <span>{errors.password.message}</span>}
-                    {errors.password.type === 'minLength' && <span>{errors.password.message}</span>}
-                  </>
-                ) : (
-                  ''
-                )
-              }
-            />
-            <button
-              type='button'
-              onClick={togglePasswordVisibility}
-              style={{
-                position: 'absolute',
-                top: 18,
-                right: 20,
-                cursor: 'pointer',
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-              }}
-            >
-              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-            </button>
-          </div>
-
-          <Button size='medium' variant='contained' color='secondary' type='submit'>
-            Log in
-          </Button>
-          <Button
+          <button
             type='button'
-            size='medium'
-            variant='contained'
-            onClick={signUpClickHandler}
+            onClick={togglePasswordVisibility}
             style={{
+              position: 'absolute',
+              top: 18,
+              right: 20,
+              cursor: 'pointer',
               background: 'transparent',
-              marginTop: 15,
-              color: 'rgb(166, 92, 240)',
-              border: '1px solid rgb(166, 92, 240)',
+              border: 'none',
+              padding: 0,
             }}
           >
-            Sign up
-          </Button>
-          <div>
-            {emailModalNeeded && (
-              <SimpleSnackbar
-                text='This email is not registered! Please sign up first!'
-                closeModal={closeEmailModal}
-              />
-            )}
-          </div>
-          <div>
-            {passwordModalNeeded && (
-              <SimpleSnackbar
-                text='This password is wrong! Please try again!'
-                closeModal={closePasswordModal}
-              />
-            )}
-          </div>
-        </form>
-      </Container>
+            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+          </button>
+        </div>
+
+        <Button size='medium' variant='contained' color='secondary' type='submit'>
+          Log in
+        </Button>
+        <Button
+          type='button'
+          size='medium'
+          variant='contained'
+          onClick={signUpClickHandler}
+          style={{
+            background: 'transparent',
+            marginTop: 15,
+            color: 'rgb(166, 92, 240)',
+            border: '1px solid rgb(166, 92, 240)',
+          }}
+        >
+          Sign up
+        </Button>
+        <div>
+          {emailModalNeeded && (
+            <SimpleSnackbar
+              text='This email is not registered! Please sign up first!'
+              closeModal={closeEmailModal}
+            />
+          )}
+        </div>
+        <div>
+          {passwordModalNeeded && (
+            <SimpleSnackbar
+              text='This password is wrong! Please try again!'
+              closeModal={closePasswordModal}
+            />
+          )}
+        </div>
+      </form>
     </>
   );
 }
