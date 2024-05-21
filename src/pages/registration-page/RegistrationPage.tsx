@@ -68,7 +68,6 @@ function RegistrationPage() {
     setShowPassword((prevShowPassword) => !prevShowPassword);
   };
 
-
   const postalCodeValidation = (country: string) => {
     if (country === 'US') {
       return {
@@ -327,7 +326,10 @@ function RegistrationPage() {
                       <Grid item xs={12}>
                         <FormControlLabel
                           control={
-                            <Checkbox {...register('defaultShippingAddress')} defaultChecked={false} />
+                            <Checkbox
+                              {...register('defaultShippingAddress')}
+                              defaultChecked={false}
+                            />
                           }
                           label='Default Shipping Address'
                         />
