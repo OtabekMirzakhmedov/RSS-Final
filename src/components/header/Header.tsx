@@ -1,7 +1,6 @@
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -10,8 +9,10 @@ import List from '@mui/material/List';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { getAccessToken } from '../../service/AuthenticationService';
+import { useNavigate } from 'react-router-dom';
+import ButtonLogin from '../buttons/button-login/ButtonLogin';
+import ButtonRegister from '../buttons/button-register/ButtonRegister';
+import ButtonLogout from '../buttons/button-logout/ButtonLogout';
 import './header.scss';
 
 function Header() {
@@ -23,27 +24,6 @@ function Header() {
     navigate('/');
   };
 
-  const handleLoginClick = () => {
-    navigate('/login');
-  };
-
-  const handleRegistrationClick = () => {
-    navigate('/create-account');
-  };
-
-  const location = useLocation();
-
-  const handleLogoutClick = () => {
-    localStorage.clear();
-    getAccessToken()
-      .then(() => {
-        navigate('/');
-      })
-      .catch((error) => {
-        throw new Error(`Error logging out: ${error}`);
-      });
-  };
-
   return (
     <AppBar position='static' className='app-bar'>
       <Toolbar>
@@ -52,28 +32,11 @@ function Header() {
         </Typography>
         <Box className='button-box' sx={{ display: { xs: 'none', sm: 'flex' } }}>
           {isLoggedin ? (
-            <Button variant='contained' color='error' onClick={handleLogoutClick}>
-              Logout
-            </Button>
+            <ButtonLogout />
           ) : (
             <>
-              <Button
-                variant='contained'
-                color='success'
-                disabled={location.pathname === '/login'}
-                onClick={handleLoginClick}
-              >
-                Login
-              </Button>
-              <Button
-                variant='outlined'
-                color='inherit'
-                className='registration-button'
-                disabled={location.pathname === '/create-account'}
-                onClick={handleRegistrationClick}
-              >
-                Register
-              </Button>
+              <ButtonLogin />
+              <ButtonRegister />
             </>
           )}
         </Box>
@@ -100,32 +63,15 @@ function Header() {
         <List>
           {isLoggedin ? (
             <ListItem>
-              <Button variant='contained' color='error' onClick={handleLogoutClick}>
-                Logout
-              </Button>
+              <ButtonLogout />
             </ListItem>
           ) : (
             <>
               <ListItem>
-                <Button
-                  variant='contained'
-                  color='success'
-                  disabled={location.pathname === '/login'}
-                  onClick={handleLoginClick}
-                >
-                  Login
-                </Button>
+                <ButtonLogin />
               </ListItem>
               <ListItem>
-                <Button
-                  variant='outlined'
-                  color='inherit'
-                  className='registration-button'
-                  disabled={location.pathname === '/create-account'}
-                  onClick={handleRegistrationClick}
-                >
-                  Register
-                </Button>
+                <ButtonRegister />
               </ListItem>
             </>
           )}
