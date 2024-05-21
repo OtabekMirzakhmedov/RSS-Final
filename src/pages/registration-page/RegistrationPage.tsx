@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable react/jsx-props-no-spreading */
 import {
   Avatar,
@@ -29,25 +30,27 @@ import { useNavigate } from 'react-router-dom';
 import { createAccount, login } from '../../service/AuthenticationService';
 import Header from '../../components/header/Header';
 
-interface RegisterField {
+interface SignUpData {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  repeatPassword: string;
+}
+
+interface AddressData {
   street: string;
   city: string;
   country: string;
   postal: string;
-  defaultShippingAddress: boolean;
-  defaultBillingAddress: boolean;
 }
 
-interface FormData {
-  email: string;
-  firstName: string;
-  lastName: string;
-  password: string;
+interface RegistrationFormData {
+  signUpData: SignUpData;
+  repeatPassword: string;
+  shippingAddressData: AddressData;
+  billingAddressData?: AddressData | null;
+  defaultShippingAddress: boolean;
+  defaultBillingAddress: boolean;
 }
 
 function RegistrationPage() {
@@ -90,21 +93,49 @@ function RegistrationPage() {
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm<RegisterField>({
+  } = useForm<RegistrationFormData>({
     mode: 'onChange',
     defaultValues: {
-      country: 'US', // Set a default value for the country
+      signUpData: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+      },
+      shippingAddressData: {
+        street: '',
+        city: '',
+        country: 'US',
+        postal: '',
+      },
+      repeatPassword: '',
+      billingAddressData: null,
+      defaultShippingAddress: false,
+      defaultBillingAddress: false,
     },
   });
 
-  const onSubmit = async (data: FormData): Promise<void> => {
+  const onSubmit = async (data: RegistrationFormData): Promise<void> => {
+    const {
+      signUpData,
+      shippingAddressData,
+      billingAddressData,
+      defaultShippingAddress,
+      defaultBillingAddress,
+    } = data;
+
+    console.log('shippingaddress', shippingAddressData);
+    console.log('billingaddress', billingAddressData);
+    console.log('defaultshippingaddress', defaultShippingAddress);
+    console.log('billingaddress', defaultBillingAddress);
+
     try {
-      const response = await createAccount(data);
+      const response = await createAccount(signUpData);
 
       if ('message' in response) {
         setError(response.message || 'An error occurred.');
       } else {
-        await login(data.email, data.password);
+        await login(signUpData.email, signUpData.password);
         navigate('/');
       }
     } catch (err) {
@@ -116,8 +147,9 @@ function RegistrationPage() {
     navigate('/login');
   };
 
-  const password = watch('password');
-  const country = watch('country');
+  const password = watch('signUpData.password');
+  const country = watch('shippingAddressData.country');
+
   const handleBillingAddressCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setShowBillingAddress(event.target.checked);
   };
@@ -150,7 +182,7 @@ function RegistrationPage() {
                   id='firstName'
                   label='First Name'
                   autoFocus
-                  {...register('firstName', {
+                  {...register('signUpData.firstName', {
                     required: 'The name is required!',
                     minLength: {
                       value: 1,
@@ -163,8 +195,8 @@ function RegistrationPage() {
                     },
                   })}
                   type='text'
-                  error={!!errors.firstName}
-                  helperText={errors.firstName ? errors.firstName.message : ''}
+                  error={!!errors.signUpData?.firstName}
+                  helperText={errors.signUpData?.firstName?.message ?? ''}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -173,7 +205,7 @@ function RegistrationPage() {
                   id='lastName'
                   label='Last Name'
                   autoComplete='family-name'
-                  {...register('lastName', {
+                  {...register('signUpData.lastName', {
                     required: 'The last name is required!',
                     minLength: {
                       value: 1,
@@ -182,12 +214,12 @@ function RegistrationPage() {
                     pattern: {
                       value: /^[a-zA-Z]+$/,
                       message:
-                        'The last name must not contain numbers or special characters and use english words',
+                        'The last name must not contain numbers or special characters and use English words',
                     },
                   })}
                   type='text'
-                  error={!!errors.lastName}
-                  helperText={errors.lastName ? errors.lastName.message : ''}
+                  error={!!errors.signUpData?.lastName}
+                  helperText={errors.signUpData?.lastName?.message ?? ''}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -196,7 +228,7 @@ function RegistrationPage() {
                   id='email'
                   label='Email Address'
                   autoComplete='email'
-                  {...register('email', {
+                  {...register('signUpData.email', {
                     required: 'The email is required!',
                     pattern: {
                       value:
@@ -205,8 +237,8 @@ function RegistrationPage() {
                     },
                   })}
                   type='email'
-                  error={!!errors.email}
-                  helperText={errors.email ? errors.email.message : ''}
+                  error={!!errors.signUpData?.email}
+                  helperText={errors.signUpData?.email?.message ?? ''}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -216,15 +248,15 @@ function RegistrationPage() {
                   type={showPassword ? 'text' : 'password'}
                   id='password'
                   autoComplete='new-password'
-                  {...register('password', {
+                  {...register('signUpData.password', {
                     required: 'The password is required!',
                     minLength: {
                       value: 8,
                       message: 'Password should be at least 8 characters long',
                     },
                   })}
-                  error={!!errors.password}
-                  helperText={errors.password ? errors.password.message : ''}
+                  error={!!errors.signUpData?.password}
+                  helperText={errors.signUpData?.password?.message ?? ''}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position='end'>
@@ -244,11 +276,11 @@ function RegistrationPage() {
                   id='repeatPassword'
                   autoComplete='new-password'
                   {...register('repeatPassword', {
-                    required: 'The password is required!',
+                    required: 'The password confirmation is required!',
                     validate: (value) => value === password || 'The passwords do not match!',
                   })}
                   error={!!errors.repeatPassword}
-                  helperText={errors.repeatPassword ? errors.repeatPassword.message : ''}
+                  helperText={errors.repeatPassword?.message ?? ''}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -262,15 +294,15 @@ function RegistrationPage() {
                           label='Street'
                           type='text'
                           id='street'
-                          {...register('street', {
+                          {...register('shippingAddressData.street', {
                             required: 'The street is required!',
                             minLength: {
                               value: 1,
-                              message: 'Name: minimum length of 1 character',
+                              message: 'Street: minimum length of 1 character',
                             },
                           })}
-                          error={!!errors.street}
-                          helperText={errors.street ? errors.street.message : ''}
+                          error={!!errors.shippingAddressData?.street}
+                          helperText={errors.shippingAddressData?.street?.message ?? ''}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -279,7 +311,7 @@ function RegistrationPage() {
                           label='City'
                           type='text'
                           id='city'
-                          {...register('city', {
+                          {...register('shippingAddressData.city', {
                             required: 'The city is required!',
                             minLength: {
                               value: 1,
@@ -291,8 +323,8 @@ function RegistrationPage() {
                                 'The city must not contain numbers or special characters and use english words',
                             },
                           })}
-                          error={!!errors.city}
-                          helperText={errors.city ? errors.city.message : ''}
+                          error={!!errors.shippingAddressData?.city}
+                          helperText={errors.shippingAddressData?.city?.message ?? ''}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -302,7 +334,9 @@ function RegistrationPage() {
                             labelId='country-label'
                             id='country'
                             label='Country'
-                            {...register('country', { required: 'The country is required!' })}
+                            {...register('shippingAddressData.country', {
+                              required: 'The country is required!',
+                            })}
                             defaultValue='US'
                           >
                             <MenuItem value='US'>United States</MenuItem>
@@ -315,12 +349,12 @@ function RegistrationPage() {
                           fullWidth
                           label='Postal Code'
                           variant='outlined'
-                          {...register('postal', {
+                          {...register('shippingAddressData.postal', {
                             required: 'The postal code is required!',
                             ...postalCodeValidation(country),
                           })}
-                          error={!!errors.postal}
-                          helperText={errors.postal ? errors.postal.message : ''}
+                          error={!!errors.shippingAddressData?.postal}
+                          helperText={errors.shippingAddressData?.postal?.message ?? ''}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -361,16 +395,16 @@ function RegistrationPage() {
                             fullWidth
                             label='Street'
                             type='text'
-                            id='street'
-                            {...register('street', {
+                            id='billingStreet'
+                            {...register('billingAddressData.street', {
                               required: 'The street is required!',
                               minLength: {
                                 value: 1,
-                                message: 'Name: minimum length of 1 character',
+                                message: 'Street: minimum length of 1 character',
                               },
                             })}
-                            error={!!errors.street}
-                            helperText={errors.street ? errors.street.message : ''}
+                            error={!!errors.billingAddressData?.street}
+                            helperText={errors.billingAddressData?.street?.message ?? ''}
                           />
                         </Grid>
                         <Grid item xs={12}>
@@ -378,8 +412,8 @@ function RegistrationPage() {
                             fullWidth
                             label='City'
                             type='text'
-                            id='city'
-                            {...register('city', {
+                            id='billingCity'
+                            {...register('billingAddressData.city', {
                               required: 'The city is required!',
                               minLength: {
                                 value: 1,
@@ -391,18 +425,20 @@ function RegistrationPage() {
                                   'The city must not contain numbers or special characters and use english words',
                               },
                             })}
-                            error={!!errors.city}
-                            helperText={errors.city ? errors.city.message : ''}
+                            error={!!errors.billingAddressData?.city}
+                            helperText={errors.billingAddressData?.city?.message ?? ''}
                           />
                         </Grid>
                         <Grid item xs={12}>
                           <FormControl fullWidth>
-                            <InputLabel id='country-label'>Country</InputLabel>
+                            <InputLabel id='billing-country-label'>Country</InputLabel>
                             <Select
-                              labelId='country-label'
-                              id='country'
+                              labelId='billing-country-label'
+                              id='billing-country'
                               label='Country'
-                              {...register('country', { required: 'The country is required!' })}
+                              {...register('billingAddressData.country', {
+                                required: 'The country is required!',
+                              })}
                               defaultValue='US'
                             >
                               <MenuItem value='US'>United States</MenuItem>
@@ -415,12 +451,12 @@ function RegistrationPage() {
                             fullWidth
                             label='Postal Code'
                             variant='outlined'
-                            {...register('postal', {
+                            {...register('billingAddressData.postal', {
                               required: 'The postal code is required!',
                               ...postalCodeValidation(country),
                             })}
-                            error={!!errors.postal}
-                            helperText={errors.postal ? errors.postal.message : ''}
+                            error={!!errors.billingAddressData?.postal}
+                            helperText={errors.billingAddressData?.postal?.message ?? ''}
                           />
                         </Grid>
                         <Grid item xs={12}>
