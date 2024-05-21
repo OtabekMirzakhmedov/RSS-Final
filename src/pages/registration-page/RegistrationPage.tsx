@@ -98,8 +98,14 @@ function RegistrationPage() {
   });
 
   const onSubmit = async (data: FormData): Promise<void> => {
+    const formData: FormData = {
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      password: data.password,
+    };
     try {
-      const response = await createAccount(data);
+      const response = await createAccount(formData);
 
       if ('message' in response) {
         setError(response.message || 'An error occurred.');
