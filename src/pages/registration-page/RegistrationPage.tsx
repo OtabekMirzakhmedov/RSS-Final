@@ -222,6 +222,11 @@ function RegistrationPage() {
                       value: 8,
                       message: 'Password should be at least 8 characters long',
                     },
+                    pattern: {
+                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+                      message:
+                        'Password should contain at least 1 uppercase letter, 1 lowercase letter, and 1 number',
+                    },
                   })}
                   error={!!errors.password}
                   helperText={errors.password ? errors.password.message : ''}
