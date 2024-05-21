@@ -104,6 +104,11 @@ export default function LoginPage() {
                 value: 8,
                 message: 'Password must be at least 8 characters long',
               },
+              pattern: {
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+                message:
+                  'Password should contain at least 1 uppercase letter, 1 lowercase letter, and 1 number',
+              },
             })}
             type={showPassword ? 'text' : 'password'}
             error={!!errors.password}
@@ -112,6 +117,7 @@ export default function LoginPage() {
                 <>
                   {errors.password.type === 'required' && <span>{errors.password.message}</span>}
                   {errors.password.type === 'minLength' && <span>{errors.password.message}</span>}
+                  {errors.password.type === 'pattern' && <span>{errors.password.message}</span>}
                 </>
               ) : (
                 ''
