@@ -16,18 +16,16 @@ interface TokenResponse {
   refresh_token: string;
 }
 
-interface SignupResponse {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
-
 interface SignupData {
   email: string;
   firstName: string;
   lastName: string;
   password: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message: string;
 }
 
 type InitialTokenResponse = Omit<TokenResponse, 'expires_in' | 'refresh_token'>;
@@ -138,9 +136,7 @@ export const checkEmail = async (emailAddress: string, password: string) => {
   return errorText;
 };
 
-export const createAccount = async (data: SignupData): Promise<SignupResponse | AxiosError> => {
-  let result: SignupResponse | null = null;
-
+export const createAccount = async (data: SignupData): Promise<ApiResponse> => {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
@@ -153,12 +149,22 @@ export const createAccount = async (data: SignupData): Promise<SignupResponse | 
   };
 
   try {
-    const response: AxiosResponse<SignupResponse> = await axios.request(config);
-    result = response.data;
+    await axios.request(config);
+    return {
+      success: true,
+      message: 'Account created successfully!',
+    };
   } catch (error) {
-    const axiosError = error as AxiosError;
-    return axiosError;
+    if (axios.isAxiosError(error) && error.response) {
+      return {
+        success: false,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        message: error.response.data.message as string,
+      };
+    }
+    return {
+      success: false,
+      message: 'An error occurred during registration.',
+    };
   }
-
-  return result;
 };
