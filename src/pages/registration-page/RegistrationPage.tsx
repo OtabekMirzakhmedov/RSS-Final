@@ -54,6 +54,11 @@ interface FormData {
   password: string;
 }
 
+interface Response {
+  success: boolean;
+  message: string;
+}
+
 function RegistrationPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showBillingAddress, setShowBillingAddress] = useState(false);
@@ -114,7 +119,7 @@ function RegistrationPage() {
       password: data.password,
     };
     try {
-      const response = await createAccount(formData);
+      const response: Response = await createAccount(formData);
       setLoading(false);
 
       if (!response.success) {

@@ -87,11 +87,10 @@ export default function LoginPage() {
               required: 'The email is required!',
               pattern: {
                 value:
-                  /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
-                message: 'Please enter a valid email!',
+                  /^[a-z0-9!#$%&'+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&'+/=?^_`{|}~-]+)@(?:[a-z0-9](?:[a-z0-9-][a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/,
+                message: 'Please enter a valid email and delete spaces!',
               },
             })}
-            type='email'
             error={!!errors.email}
             helperText={errors.email ? errors.email.message : ''}
           />
