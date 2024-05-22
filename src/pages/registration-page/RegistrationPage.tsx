@@ -57,6 +57,7 @@ interface FormData {
 function RegistrationPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showBillingAddress, setShowBillingAddress] = useState(false);
+  const error = false;
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
