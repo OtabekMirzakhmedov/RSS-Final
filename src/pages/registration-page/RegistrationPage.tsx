@@ -19,6 +19,10 @@ import {
   CardHeader,
   FormControlLabel,
   Checkbox,
+  Backdrop,
+  Snackbar,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -52,8 +56,11 @@ interface FormData {
 
 function RegistrationPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [showBillingAddress, setShowBillingAddress] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   const isLoggedin = localStorage.getItem('token') !== null;
   const navigate = useNavigate();
@@ -93,11 +100,12 @@ function RegistrationPage() {
   } = useForm<RegisterField>({
     mode: 'onChange',
     defaultValues: {
-      country: 'US', // Set a default value for the country
+      country: 'US',
     },
   });
 
   const onSubmit = async (data: FormData): Promise<void> => {
+    setLoading(true);
     const formData: FormData = {
       email: data.email,
       firstName: data.firstName,
@@ -106,16 +114,29 @@ function RegistrationPage() {
     };
     try {
       const response = await createAccount(formData);
+      setLoading(false);
 
-      if ('message' in response) {
-        setError(response.message || 'An error occurred.');
+      if (!response.success) {
+        setSnackbarSeverity('error');
+        setSnackbarMessage(response.message);
+        setSnackbarOpen(true);
       } else {
+        setSnackbarSeverity('success');
+        setSnackbarMessage('Account created successfully!');
+        setSnackbarOpen(true);
         await login(data.email, data.password);
         navigate('/');
       }
     } catch (err) {
-      setError('An error occurred.');
+      setLoading(false);
+      setSnackbarSeverity('error');
+      setSnackbarMessage('An unexpected error occurred.');
+      setSnackbarOpen(true);
     }
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   const handleLoginClick = (): void => {
@@ -465,6 +486,19 @@ function RegistrationPage() {
           </form>
         </Box>
       </Container>
+      <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
+        <CircularProgress color='inherit' />
+      </Backdrop>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

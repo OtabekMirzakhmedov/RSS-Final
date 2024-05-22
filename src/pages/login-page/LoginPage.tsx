@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, TextField, Container } from '@mui/material';
+import { Button, TextField, Container, Backdrop, CircularProgress } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { checkEmail } from '../../service/AuthenticationService';
@@ -24,6 +24,8 @@ export default function LoginPage() {
       navigate('/');
     }
   }, [isLoggedin, navigate]);
+
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -50,7 +52,9 @@ export default function LoginPage() {
   const password = watch('password');
 
   const onSubmit = async (): Promise<void> => {
+    setLoading(true);
     const response = await checkEmail(email, password);
+    setLoading(false);
 
     if (response === 'This email is not registered') {
       setEmailModalNeeded(true);
@@ -177,6 +181,9 @@ export default function LoginPage() {
           </div>
         </form>
       </Container>
+      <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
+        <CircularProgress color='inherit' />
+      </Backdrop>
     </>
   );
 }
