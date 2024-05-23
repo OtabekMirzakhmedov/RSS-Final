@@ -50,7 +50,6 @@ export default function LoginPage() {
   };
   const email = watch('email');
   const password = watch('password');
-
   const onSubmit = async (): Promise<void> => {
     setLoading(true);
     const response = await checkEmail(email, password);
@@ -86,11 +85,11 @@ export default function LoginPage() {
             {...register('email', {
               required: 'The email is required!',
               pattern: {
-                value:
-                  /^[a-z0-9!#$%&'+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&'+/=?^_`{|}~-]+)@(?:[a-z0-9](?:[a-z0-9-][a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/,
+                value: /^\s*[^\s]+@\S+\.\S+\s*$/,
                 message: 'Please enter a valid email and delete spaces!',
               },
             })}
+            type='email'
             error={!!errors.email}
             helperText={errors.email ? errors.email.message : ''}
           />
