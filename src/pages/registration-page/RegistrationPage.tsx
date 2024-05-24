@@ -36,6 +36,7 @@ import Header from '../../components/header/Header';
 interface RegisterField {
   firstName: string;
   lastName: string;
+  birthDate: string;
   email: string;
   password: string;
   repeatPassword: string;
@@ -221,6 +222,38 @@ function RegistrationPage() {
                   type='text'
                   error={!!errors.lastName}
                   helperText={errors.lastName ? errors.lastName.message : ''}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  id='birthDate'
+                  label='Date of Birth'
+                  type='date'
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  {...register('birthDate', {
+                    required: 'The date of birth is required!',
+                    validate: (value) => {
+                      const now = new Date();
+                      const minAge = 13;
+                      const dob = new Date(value);
+                      const thirteenYearsAgo = new Date(
+                        now.getFullYear() - minAge,
+                        now.getMonth(),
+                        now.getDate()
+                      );
+
+                      // Проверка, что пользователю 13 лет и более
+                      if (dob > thirteenYearsAgo) {
+                        return 'You must be at least 13 years old.';
+                      }
+                      return true;
+                    },
+                  })}
+                  error={!!errors.birthDate}
+                  helperText={errors.birthDate ? errors.birthDate.message : ''}
                 />
               </Grid>
               <Grid item xs={12}>
