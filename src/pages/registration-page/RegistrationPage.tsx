@@ -32,6 +32,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createAccount, login } from '../../service/AuthenticationService';
 import Header from '../../components/header/Header';
+import { Routes } from '../pages-types/pageTypes';
+import FormValidationMessages from '../pages-types/validateTypes';
 
 interface RegisterField {
   firstName: string;
@@ -74,7 +76,7 @@ function RegistrationPage() {
 
   useEffect(() => {
     if (isLoggedin) {
-      navigate('/');
+      navigate(Routes.HOME);
     }
   }, [isLoggedin, navigate]);
 
@@ -87,14 +89,14 @@ function RegistrationPage() {
       return {
         pattern: {
           value: /^\d{5}(-\d{4})?$/,
-          message: 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789).',
+          message: FormValidationMessages.postalCode.US,
         },
       };
     }
     return {
       pattern: {
         value: /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/,
-        message: 'Please enter a valid postal code (e.g., A1A 1A1 or A1A1A1).',
+        message: FormValidationMessages.postalCode.default,
       },
     };
   };
@@ -132,7 +134,7 @@ function RegistrationPage() {
         setSnackbarMessage('Account created successfully!');
         setSnackbarOpen(true);
         await login(data.email, data.password);
-        navigate('/');
+        navigate(Routes.HOME);
       }
     } catch (err) {
       setLoading(false);
@@ -147,7 +149,7 @@ function RegistrationPage() {
   };
 
   const handleLoginClick = (): void => {
-    navigate('/login');
+    navigate(Routes.LOGIN);
   };
 
   const password = watch('password');
@@ -185,15 +187,14 @@ function RegistrationPage() {
                   label='First Name'
                   autoFocus
                   {...register('firstName', {
-                    required: 'The name is required!',
+                    required: FormValidationMessages.Name.Required,
                     minLength: {
                       value: 1,
-                      message: 'Name: minimum length of 1 character',
+                      message: FormValidationMessages.Name.MinLength,
                     },
                     pattern: {
                       value: /^[a-zA-Z]+$/,
-                      message:
-                        'The name must not contain numbers or special characters and use english words',
+                      message: FormValidationMessages.Name.InvalidFormat,
                     },
                   })}
                   type='text'
@@ -208,15 +209,14 @@ function RegistrationPage() {
                   label='Last Name'
                   autoComplete='family-name'
                   {...register('lastName', {
-                    required: 'The last name is required!',
+                    required: FormValidationMessages.LastName.Required,
                     minLength: {
                       value: 1,
-                      message: 'Last name: minimum length of 1 character',
+                      message: FormValidationMessages.LastName.MinLength,
                     },
                     pattern: {
                       value: /^[a-zA-Z]+$/,
-                      message:
-                        'The last name must not contain numbers or special characters and use english words',
+                      message: FormValidationMessages.LastName.InvalidFormat,
                     },
                   })}
                   type='text'
@@ -234,7 +234,7 @@ function RegistrationPage() {
                     shrink: true,
                   }}
                   {...register('birthDate', {
-                    required: 'The date of birth is required!',
+                    required: FormValidationMessages.Birthday.Required,
                     validate: (value) => {
                       const now = new Date();
                       const minAge = 13;
@@ -247,7 +247,7 @@ function RegistrationPage() {
 
                       // Проверка, что пользователю 13 лет и более
                       if (dob > thirteenYearsAgo) {
-                        return 'You must be at least 13 years old.';
+                        return FormValidationMessages.Birthday.InvalidFormat;
                       }
                       return true;
                     },
@@ -263,11 +263,11 @@ function RegistrationPage() {
                   label='Email Address'
                   autoComplete='email'
                   {...register('email', {
-                    required: 'The email is required!',
+                    required: FormValidationMessages.Email.Required,
                     pattern: {
                       value:
                         /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
-                      message: 'Please enter a valid email!',
+                      message: FormValidationMessages.Email.InvalidFormat,
                     },
                   })}
                   type='email'
@@ -283,15 +283,14 @@ function RegistrationPage() {
                   id='password'
                   autoComplete='new-password'
                   {...register('password', {
-                    required: 'The password is required!',
+                    required: FormValidationMessages.Password.Required,
                     minLength: {
                       value: 8,
-                      message: 'Password should be at least 8 characters long',
+                      message: FormValidationMessages.Password.MinLength,
                     },
                     pattern: {
                       value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
-                      message:
-                        'Password should contain at least 1 uppercase letter, 1 lowercase letter, and 1 number',
+                      message: FormValidationMessages.Password.Pattern,
                     },
                   })}
                   error={!!errors.password}
@@ -315,8 +314,9 @@ function RegistrationPage() {
                   id='repeatPassword'
                   autoComplete='new-password'
                   {...register('repeatPassword', {
-                    required: 'The password is required!',
-                    validate: (value) => value === password || 'The passwords do not match!',
+                    required: FormValidationMessages.Password.Required,
+                    validate: (value) =>
+                      value === password || FormValidationMessages.Password.NotMatch,
                   })}
                   error={!!errors.repeatPassword}
                   helperText={errors.repeatPassword ? errors.repeatPassword.message : ''}
@@ -334,10 +334,10 @@ function RegistrationPage() {
                           type='text'
                           id='street'
                           {...register('street', {
-                            required: 'The street is required!',
+                            required: FormValidationMessages.Street.Required,
                             minLength: {
                               value: 1,
-                              message: 'Name: minimum length of 1 character',
+                              message: FormValidationMessages.Street.MinLength,
                             },
                           })}
                           error={!!errors.street}
@@ -351,15 +351,14 @@ function RegistrationPage() {
                           type='text'
                           id='city'
                           {...register('city', {
-                            required: 'The city is required!',
+                            required: FormValidationMessages.City.Required,
                             minLength: {
                               value: 1,
-                              message: 'City: minimum length of 1 character',
+                              message: FormValidationMessages.City.MinLength,
                             },
                             pattern: {
                               value: /^[a-zA-Z]+$/,
-                              message:
-                                'The city must not contain numbers or special characters and use english words',
+                              message: FormValidationMessages.City.InvalidFormat,
                             },
                           })}
                           error={!!errors.city}
@@ -373,7 +372,9 @@ function RegistrationPage() {
                             labelId='country-label'
                             id='country'
                             label='Country'
-                            {...register('country', { required: 'The country is required!' })}
+                            {...register('country', {
+                              required: FormValidationMessages.Country.Required,
+                            })}
                             defaultValue='US'
                           >
                             <MenuItem value='US'>United States</MenuItem>
@@ -387,7 +388,7 @@ function RegistrationPage() {
                           label='Postal Code'
                           variant='outlined'
                           {...register('postal', {
-                            required: 'The postal code is required!',
+                            required: FormValidationMessages.postalCode.Required,
                             ...postalCodeValidation(country),
                           })}
                           error={!!errors.postal}
@@ -434,10 +435,10 @@ function RegistrationPage() {
                             type='text'
                             id='street'
                             {...register('street', {
-                              required: 'The street is required!',
+                              required: FormValidationMessages.Street.Required,
                               minLength: {
                                 value: 1,
-                                message: 'Name: minimum length of 1 character',
+                                message: FormValidationMessages.Street.MinLength,
                               },
                             })}
                             error={!!errors.street}
@@ -451,15 +452,14 @@ function RegistrationPage() {
                             type='text'
                             id='city'
                             {...register('city', {
-                              required: 'The city is required!',
+                              required: FormValidationMessages.City.Required,
                               minLength: {
                                 value: 1,
-                                message: 'City: minimum length of 1 character',
+                                message: FormValidationMessages.City.MinLength,
                               },
                               pattern: {
                                 value: /^[a-zA-Z]+$/,
-                                message:
-                                  'The city must not contain numbers or special characters and use english words',
+                                message: FormValidationMessages.City.InvalidFormat,
                               },
                             })}
                             error={!!errors.city}
@@ -473,7 +473,9 @@ function RegistrationPage() {
                               labelId='country-label'
                               id='country'
                               label='Country'
-                              {...register('country', { required: 'The country is required!' })}
+                              {...register('country', {
+                                required: FormValidationMessages.Country.Required,
+                              })}
                               defaultValue='US'
                             >
                               <MenuItem value='US'>United States</MenuItem>
@@ -487,7 +489,7 @@ function RegistrationPage() {
                             label='Postal Code'
                             variant='outlined'
                             {...register('postal', {
-                              required: 'The postal code is required!',
+                              required: FormValidationMessages.postalCode.Required,
                               ...postalCodeValidation(country),
                             })}
                             error={!!errors.postal}
