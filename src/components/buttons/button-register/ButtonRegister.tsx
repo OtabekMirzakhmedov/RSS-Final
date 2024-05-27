@@ -1,5 +1,6 @@
 import Button from '@mui/material/Button';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Routes } from '../../../pages/pages-types/pageTypes';
 
 export default function ButtonRegister() {
   const navigate = useNavigate();
@@ -7,17 +8,17 @@ export default function ButtonRegister() {
   const location = useLocation();
 
   const handleRegistrationClick = () => {
-    navigate('/create-account');
+    navigate(Routes.REGISTER);
   };
   return (
     <Button
       variant='outlined'
       color='inherit'
       className='registration-button'
-      disabled={location.pathname === '/create-account'}
+      disabled={location.pathname === Routes.REGISTER.toString()}
       onClick={handleRegistrationClick}
     >
-      Register
+      SIGN UP
     </Button>
   );
 }

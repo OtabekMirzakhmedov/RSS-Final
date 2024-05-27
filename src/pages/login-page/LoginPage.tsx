@@ -7,8 +7,10 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { checkEmail } from '../../service/AuthenticationService';
 import Header from '../../components/header/Header';
+import FormValidationMessages from '../pages-types/validateTypes';
 import './login.scss';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
+import { ResponseCheck, Routes } from '../pages-types/pageTypes';
 
 interface Inputs {
   email: string;
@@ -21,7 +23,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isLoggedin) {
-      navigate('/');
+      navigate(Routes.HOME);
     }
   }, [isLoggedin, navigate]);
 
@@ -55,19 +57,19 @@ export default function LoginPage() {
     const response = await checkEmail(email, password);
     setLoading(false);
 
-    if (response === 'This email is not registered') {
+    if (response === ResponseCheck.NotRegistered.toString()) {
       setEmailModalNeeded(true);
-    } else if (response === 'Wrong password') {
+    } else if (response === ResponseCheck.WrongPassword.toString()) {
       setPasswordModalNeeded(true);
     } else {
-      navigate('/');
+      navigate(Routes.HOME);
       localStorage.setItem('initial_token', '');
     }
     reset();
   };
 
   const signUpClickHandler = () => {
-    navigate('/create-account');
+    navigate(Routes.REGISTER);
   };
 
   return (
@@ -83,10 +85,10 @@ export default function LoginPage() {
               marginBottom: 20,
             }}
             {...register('email', {
-              required: 'The email is required!',
+              required: FormValidationMessages.Email.Required,
               pattern: {
                 value: /^\s*[^\s]+@\S+\.\S+\s*$/,
-                message: 'Please enter a valid email and delete spaces!',
+                message: FormValidationMessages.Email.InvalidFormat,
               },
             })}
             type='email'
@@ -102,29 +104,22 @@ export default function LoginPage() {
               }}
               placeholder='Enter your password'
               {...register('password', {
-                required: 'The password is required!',
+                required: FormValidationMessages.Password.Required,
                 minLength: {
                   value: 8,
-                  message: 'Password must be at least 8 characters long',
+                  message: FormValidationMessages.Password.MinLength,
                 },
                 pattern: {
                   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
-                  message:
-                    'Password should contain at least 1 uppercase letter, 1 lowercase letter, and 1 number',
+                  message: FormValidationMessages.Password.Pattern,
                 },
               })}
               type={showPassword ? 'text' : 'password'}
               error={!!errors.password}
               helperText={
-                errors.password ? (
-                  <>
-                    {errors.password.type === 'required' && <span>{errors.password.message}</span>}
-                    {errors.password.type === 'minLength' && <span>{errors.password.message}</span>}
-                    {errors.password.type === 'pattern' && <span>{errors.password.message}</span>}
-                  </>
-                ) : (
-                  ''
-                )
+                errors.password
+                  ? errors.password.type && <span>{errors.password.message}</span>
+                  : ''
               }
             />
             <button

@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { ResponseCheck } from '../pages/pages-types/pageTypes';
+import ResponseCode from './AuthenticationTypes';
 
 const projectKey = 'rss-final-commerce';
 const clientSecret = '2LueY3l6v5jSwKM5gaYnEnu0jIYtSoLt';
@@ -87,7 +89,7 @@ export const login = async (email: string, password: string) => {
       const axiosError = error as AxiosError;
       if (axiosError.response) {
         const errorResponseStatus = axiosError.response.status;
-        if (errorResponseStatus === 400) {
+        if (errorResponseStatus === ResponseCode.BadRequest) {
           result = errorResponseStatus;
         }
       }
@@ -123,11 +125,11 @@ export const checkEmail = async (emailAddress: string, password: string) => {
     if (response.data.count === 1) {
       errorText = 'No error!';
       const resp = await login(emailAddress, password);
-      if (resp === 400) {
-        errorText = 'Wrong password';
+      if (resp === ResponseCode.BadRequest) {
+        errorText = ResponseCheck.WrongPassword;
       }
     } else {
-      errorText = 'This email is not registered';
+      errorText = ResponseCheck.NotRegistered;
     }
   } catch (error) {
     console.log(error);
@@ -137,13 +139,15 @@ export const checkEmail = async (emailAddress: string, password: string) => {
 };
 
 export const createAccount = async (data: SignupData): Promise<ApiResponse> => {
+  const initialToken = localStorage.getItem('initial_token');
+  const tokenValue = initialToken ? `Bearer ${initialToken}` : '';
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
     url: `${host}/${projectKey}/customers`,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('initial_token')}`,
+      Authorization: tokenValue,
     },
     data,
   };
@@ -158,8 +162,7 @@ export const createAccount = async (data: SignupData): Promise<ApiResponse> => {
     if (axios.isAxiosError(error) && error.response) {
       return {
         success: false,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        message: error.response.data.message as string,
+        message: error.message,
       };
     }
     return {
