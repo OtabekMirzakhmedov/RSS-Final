@@ -262,7 +262,7 @@ function RegistrationPage() {
                   id='email'
                   label='Email Address'
                   autoComplete='email'
-                  {...register('email', 
+                  {...register('email', {
                     required: FormValidationMessages.Email.Required,
                     pattern: {
                       value:
@@ -316,7 +316,7 @@ function RegistrationPage() {
                   {...register('repeatPassword', {
                     required: FormValidationMessages.Password.Required,
                     validate: (value) =>
-                      value === password || FormValidationMessages.Password.NotMatch,roduct-profile
+                      value === password || FormValidationMessages.Password.NotMatch,
                   })}
                   error={!!errors.repeatPassword}
                   helperText={errors.repeatPassword ? errors.repeatPassword.message : ''}
