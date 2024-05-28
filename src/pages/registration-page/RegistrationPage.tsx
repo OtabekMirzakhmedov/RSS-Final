@@ -262,7 +262,7 @@ function RegistrationPage() {
                   id='email'
                   label='Email Address'
                   autoComplete='email'
-                  {...register('email', {
+                  {...register('email', 
                     required: FormValidationMessages.Email.Required,
                     pattern: {
                       value:
