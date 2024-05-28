@@ -1,0 +1,25 @@
+@import '../../index.scss';
+
+.app-bar {
+  background-color: $primary-color !important;
+}
+
+.title {
+  flex-grow: 1;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.button-box {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  text-transform: none;
+}
+
+.registration-button:hover {
+  background-color: white !important;
+  color: $primary-color;
+}

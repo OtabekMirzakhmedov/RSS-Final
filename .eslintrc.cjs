@@ -16,19 +16,34 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:import/recommended',
     'airbnb',
-    'prettier'
+    'prettier',
+    'airbnb-typescript',
+    'airbnb/hooks',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs', 'node_modules'],
   parser: '@typescript-eslint/parser',
   plugins: ['react', 'react-refresh'],
   rules: {
-    'react-refresh/only-export-components': [
-      'warn',
-      { allowConstantExport: true },
+    'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    '@typescript-eslint/no-misused-promises': [
+      2,
+      {
+        checksVoidReturn: {
+          attributes: false,
+        },
+      },
     ],
-    'react/jsx-filename-extension': [1, { extensions: ['.tsx', '.jsx'] }],
     'react/react-in-jsx-scope': 0,
     'react/jsx-uses-react': 0,
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'linebreak-style': 0,
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
   },
-}
+};

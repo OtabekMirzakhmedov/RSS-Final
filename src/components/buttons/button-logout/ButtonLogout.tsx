@@ -1,0 +1,25 @@
+import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
+import { getAccessToken } from '../../../service/AuthenticationService';
+import { Routes } from '../../../pages/pages-types/pageTypes';
+
+export default function ButtonLogout() {
+  const navigate = useNavigate();
+
+  const handleLogoutClick = () => {
+    localStorage.clear();
+    getAccessToken()
+      .then(() => {
+        navigate(Routes.HOME);
+      })
+      .catch((error) => {
+        throw new Error(`Error logging out: ${error}`);
+      });
+  };
+
+  return (
+    <Button variant='contained' color='error' onClick={handleLogoutClick}>
+      Logout
+    </Button>
+  );
+}
