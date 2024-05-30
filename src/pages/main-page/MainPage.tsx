@@ -24,13 +24,14 @@ function MainPage() {
         } else {
           setError(new Error('Failed to fetch products'));
         }
-      } catch (error) {
-        setError(error as Error);
+      } catch (fetchError) {
+        setError(fetchError as Error);
       } finally {
         setLoading(false);
       }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchProducts();
   }, []);
   if (loading) {
