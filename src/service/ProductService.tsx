@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable no-console */
 import axios from 'axios';
@@ -64,12 +63,17 @@ const ConvertToMainPageProductData = (products: RawProduct[]): MainPageProduct[]
   }));
 };
 
-export async function GetProducts(): Promise<MainPageProduct[] | null> {
+export async function GetProducts(sortOption?: string): Promise<MainPageProduct[] | null> {
   const initialToken = localStorage.getItem('initial_token');
   const tokenValue = `Bearer ${initialToken}`;
+  let url = `${host}/${projectKey}/product-projections`;
+
+  if (sortOption) {
+    url = `${url}/search?sort=${sortOption}`;
+  }
 
   try {
-    const response = await axios.get<ProductResponse>(`${host}/${projectKey}/product-projections`, {
+    const response = await axios.get<ProductResponse>(url, {
       headers: {
         Authorization: tokenValue,
       },
