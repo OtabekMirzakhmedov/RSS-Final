@@ -33,7 +33,7 @@ function ProductDetailsPage() {
   useEffect(() => {
     const fetchProductDetails = async () => {
       setLoading(true);
-      const productDetails = await GetProductById(productId);
+      const productDetails = await GetProductById(productId!);
       if (productDetails) {
         setProduct(productDetails);
       } else {
