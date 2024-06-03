@@ -35,6 +35,7 @@ function MainPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   const [sortOption, setSortOption] = useState<string>('');
 
   useEffect(() => {

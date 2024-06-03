@@ -4,6 +4,7 @@ import RegistrationPage from './pages/registration-page/RegistrationPage';
 import NotFoundPage from './pages/not-found-page/NotFoundPage';
 import MainPage from './pages/main-page/MainPage';
 import { getAccessToken } from './service/AuthenticationService';
+import ProfilePage from './pages/profile-page/ProfilePage';
 
 function App() {
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -15,6 +16,7 @@ function App() {
         <Route path='/login' element={<LoginPage />} />
         <Route path='/create-account' element={<RegistrationPage />} />
         <Route path='*' element={<NotFoundPage />} />
+        <Route path='/profile' element={<ProfilePage />} />
       </Routes>
     </Router>
   );
