@@ -48,7 +48,7 @@ interface MainPageProduct {
   author?: string;
   image?: string;
   price: number;
-  discountPrice?: number;
+  discountPrice: number;
 }
 
 interface ProductDetails {
