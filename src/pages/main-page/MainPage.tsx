@@ -148,7 +148,7 @@ function MainPage() {
             </div>
             <Grid container spacing={2} display='flex'>
               {products.map((product) => (
-                <Grid item key={product.id} xs={12} sm={6} md={4}>
+                <Grid item key={product.id} xs={12} sm={6} md={6} lg={3}>
                   <Card
                     onClick={() => navigate(`/product/${product.id}`)}
                     style={{ cursor: 'pointer', height: '100%' }}
@@ -156,7 +156,7 @@ function MainPage() {
                     {product.image && (
                       <CardMedia
                         component='img'
-                        height='450'
+                        height='500'
                         image={product.image}
                         alt={product.title}
                       />
