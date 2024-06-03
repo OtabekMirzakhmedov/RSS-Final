@@ -51,12 +51,13 @@ export interface MainPageProduct {
   discount?: number;
 }
 
-interface ProductDetails {
+export interface ProductDetails {
   id: string;
   title: string;
   author?: string;
   images?: string[];
   price: number;
+  discount?: number;
   description: string;
   isbn: string;
   publisherName: string;
@@ -99,6 +100,7 @@ const ConvertToProductDetailData = (product: RawProduct): ProductDetails => {
     author: author ?? '',
     images: product.masterVariant.images.map((image) => image.url),
     price: (product.masterVariant.prices[0]?.value.centAmount ?? 0) / 100,
+    discount: (product.masterVariant.prices[0]?.discounted?.value.centAmount ?? 0) / 100,
     description: product.description['en-US'],
     isbn: isbn ?? '',
     publisherName: publisherName ?? '',

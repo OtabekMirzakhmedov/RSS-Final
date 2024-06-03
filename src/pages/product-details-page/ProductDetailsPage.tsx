@@ -17,19 +17,7 @@ import {
   Button,
 } from '@mui/material';
 import Header from '../../components/header/Header';
-import { GetProductById } from '../../service/ProductService';
-
-interface ProductDetails {
-  id: string;
-  title: string;
-  author?: string;
-  images?: string[];
-  price: number;
-  description: string;
-  isbn: string;
-  publisherName: string;
-  pages: number;
-}
+import { GetProductById, ProductDetails } from '../../service/ProductService';
 
 function ProductDetailsPage() {
   const { productId } = useParams<{ productId: string }>();
@@ -178,9 +166,20 @@ function ProductDetailsPage() {
                 <Typography variant='body1' gutterBottom>
                   Description: {product.description}
                 </Typography>
-                <Typography variant='body2' color='textPrimary'>
-                  Price: ${product.price.toFixed(2)}
-                </Typography>
+                {product.discount ? (
+                  <Box display='flex' gap={3}>
+                    <Typography variant='body2' color='textPrimary' className='old-price'>
+                      Price: ${product.price.toFixed(2)}
+                    </Typography>
+                    <Typography variant='body2' color='green' fontSize='18px'>
+                      Price: ${product.discount.toFixed(2)}
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Typography variant='body2' color='textPrimary'>
+                    Price: ${product.price.toFixed(2)}
+                  </Typography>
+                )}
                 <Typography variant='body2' color='textSecondary'>
                   ISBN: {product.isbn}
                 </Typography>
