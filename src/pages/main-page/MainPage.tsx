@@ -27,7 +27,6 @@ import Header from '../../components/header/Header';
 import { GetProducts, MainPageProduct } from '../../service/ProductService';
 import './mainPage.scss';
 
-
 function MainPage() {
   const [products, setProducts] = useState<MainPageProduct[]>([]);
   const [loading, setLoading] = useState(true);
