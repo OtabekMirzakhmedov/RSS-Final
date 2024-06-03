@@ -55,35 +55,28 @@ interface RegisterField {
   defaultBillingAddress2: boolean;
 }
 
-interface FormData {
-  email: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  dateOfBirth: string;
-}
-
 interface Response {
   success: boolean;
   message: string;
 }
 
-/* interface ShippingAddress {
-  street: string;
+interface Address {
+  streetName: string;
   city: string;
   country: string;
-  postal: string;
-  isDefaultShippingAddress: boolean;
-  isDefaultBillingAddress: boolean;
+  postalCode: string;
 }
 
-interface BillingAddress {
-  street: string;
-  city: string;
-  country: string;
-  postal: string;
-  isDefaultBillingAddress: boolean;
-} */
+interface SignupData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  dateOfBirth: string;
+  addresses: Address[];
+  defaultShippingAddress?: number;
+  defaultBillingAddress?: number;
+}
 
 function RegistrationPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -139,29 +132,41 @@ function RegistrationPage() {
 
   const onSubmit = async (data: RegisterField): Promise<void> => {
     setLoading(true);
-    const formData: FormData = {
+    const shippingAddress: Address = {
+      streetName: data.shippingStreet,
+      city: data.shippingCity,
+      country: data.shippingCountry,
+      postalCode: data.shippingPostal,
+    };
+    const formData: SignupData = {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
       password: data.password,
       dateOfBirth: data.birthDate,
+      addresses: [shippingAddress],
     };
-    /* const shippingAddress: ShippingAddress = {
-      street: data.shippingStreet,
-      city: data.shippingCity,
-      country: data.shippingCountry,
-      postal: data.shippingPostal,
-      isDefaultShippingAddress: data.defaultShippingAddress,
-      isDefaultBillingAddress: data.defaultBillingAddress,
-    }; */
 
-    /* const billingAddress: BillingAddress = {
-      street: data.billingStreet,
-      city: data.billingCity,
-      country: data.billingCountry,
-      postal: data.billingPostal,
-      isDefaultBillingAddress: data.defaultBillingAddress2,
-    }; */
+    if (!data.defaultBillingAddress) {
+      const billingAddress: Address = {
+        streetName: data.billingStreet,
+        city: data.billingCity,
+        country: data.billingCountry,
+        postalCode: data.billingPostal,
+      };
+      formData.addresses.push(billingAddress);
+    }
+
+    if (data.defaultShippingAddress) {
+      formData.defaultShippingAddress = 0;
+    }
+    if (data.defaultBillingAddress) {
+      formData.defaultBillingAddress = 0;
+    }
+
+    if (!data.defaultBillingAddress && data.defaultBillingAddress2) {
+      formData.defaultBillingAddress = 1;
+    }
 
     try {
       const response: Response = await createAccount(formData);

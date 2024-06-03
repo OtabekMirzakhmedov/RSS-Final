@@ -24,6 +24,14 @@ interface SignupData {
   lastName: string;
   password: string;
   dateOfBirth: string;
+  addresses: {
+    streetName: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  }[];
+  defaultShippingAddress?: number;
+  defaultBillingAddress?: number;
 }
 
 interface ApiResponse {
@@ -145,7 +153,7 @@ export const createAccount = async (signUpData: SignupData): Promise<ApiResponse
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `${host}/${projectKey}/customers`,
+    url: `${host}/${projectKey}/me/signup`,
     headers: {
       'Content-Type': 'application/json',
       Authorization: tokenValue,
