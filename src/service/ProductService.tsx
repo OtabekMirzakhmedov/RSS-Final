@@ -38,11 +38,6 @@ interface RawProduct {
       value: {
         centAmount: number;
       };
-      discounted?: {
-        value: {
-          centAmount: number;
-        };
-      };
     }[];
   };
 }
