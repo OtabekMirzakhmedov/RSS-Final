@@ -67,7 +67,6 @@ function ProductDetailsPage() {
     setSelectedIndex(index);
   };
 
-
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
