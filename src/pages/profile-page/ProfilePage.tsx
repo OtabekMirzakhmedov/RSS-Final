@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -49,7 +48,6 @@ function ProfilePage() {
   const enterEditMode = () => {
     setEditMode(true);
   };
-  console.log(data);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Header />
