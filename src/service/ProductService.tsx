@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 /* eslint-disable no-console */
 import axios from 'axios';
 
@@ -46,6 +45,18 @@ interface MainPageProduct {
   price: number;
 }
 
+interface ProductDetails {
+  id: string;
+  title: string;
+  author?: string;
+  images?: string[];
+  price: number;
+  description: string;
+  isbn: string;
+  publisherName: string;
+  pages: number;
+}
+
 interface ProductResponse {
   limit: number;
   count: number;
@@ -61,6 +72,31 @@ const ConvertToMainPageProductData = (products: RawProduct[]): MainPageProduct[]
     image: product.masterVariant.images[0]?.url,
     price: (product.masterVariant.prices[0]?.value.centAmount ?? 0) / 100,
   }));
+};
+
+const ConvertToProductDetailData = (product: RawProduct): ProductDetails => {
+  const author = product.masterVariant.attributes.find(
+    (attr) => attr.name === 'author-name'
+  )?.value;
+  const isbn = product.masterVariant.attributes.find((attr) => attr.name === 'isbn-number')?.value;
+  const publisherName = product.masterVariant.attributes.find(
+    (attr) => attr.name === 'publisher-name'
+  )?.value;
+  const numberOfPages = product.masterVariant.attributes.find(
+    (attr) => attr.name === 'number-of-pages'
+  )?.value;
+
+  return {
+    id: product.id,
+    title: product.name['en-US'],
+    author: author ?? '',
+    images: product.masterVariant.images.map((image) => image.url),
+    price: (product.masterVariant.prices[0]?.value.centAmount ?? 0) / 100,
+    description: product.description['en-US'],
+    isbn: isbn ?? '',
+    publisherName: publisherName ?? '',
+    pages: parseInt(numberOfPages!, 10),
+  };
 };
 
 export async function GetProducts(sortOption?: string): Promise<MainPageProduct[] | null> {
@@ -86,6 +122,29 @@ export async function GetProducts(sortOption?: string): Promise<MainPageProduct[
     return cleanedProducts;
   } catch (error) {
     console.error('Error fetching products:', error);
+    return null;
+  }
+}
+
+export async function GetProductById(productId: string): Promise<ProductDetails | null> {
+  const initialToken = localStorage.getItem('initial_token');
+  const tokenValue = `Bearer ${initialToken}`;
+  const url = `${host}/${projectKey}/product-projections/${productId}`;
+
+  try {
+    const response = await axios.get<RawProduct>(url, {
+      headers: {
+        Authorization: tokenValue,
+      },
+    });
+
+    const productData = response.data;
+    console.log(productData);
+    const cleanedProduct = ConvertToProductDetailData(productData);
+    console.log(cleanedProduct);
+    return cleanedProduct;
+  } catch (error) {
+    console.error('Error fetching product:', error);
     return null;
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Container,
@@ -36,6 +37,7 @@ function MainPage() {
   const [error, setError] = useState<Error | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [sortOption, setSortOption] = useState<string>('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -127,11 +129,14 @@ function MainPage() {
             <Grid container spacing={2}>
               {products.map((product) => (
                 <Grid item key={product.id} xs={12} sm={6} md={4}>
-                  <Card>
+                  <Card
+                    onClick={() => navigate(`/product/${product.id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     {product.image && (
                       <CardMedia
                         component='img'
-                        height='140'
+                        height='350'
                         image={product.image}
                         alt={product.title}
                       />
