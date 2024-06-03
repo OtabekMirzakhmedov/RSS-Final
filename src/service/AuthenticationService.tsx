@@ -151,18 +151,18 @@ export const checkEmail = async (emailAddress: string, password: string) => {
   return errorText;
 };
 
-export const createAccount = async (data: SignupData): Promise<ApiResponse> => {
+export const createAccount = async (signUpData: SignupData): Promise<ApiResponse> => {
   const initialToken = localStorage.getItem('initial_token');
   const tokenValue = initialToken ? `Bearer ${initialToken}` : '';
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `${host}/${projectKey}/customers`,
+    url: `${host}/${projectKey}/me/signup`,
     headers: {
       'Content-Type': 'application/json',
       Authorization: tokenValue,
     },
-    data,
+    data: signUpData,
   };
 
   try {
