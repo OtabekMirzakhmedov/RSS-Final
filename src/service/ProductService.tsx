@@ -33,6 +33,11 @@ interface RawProduct {
       value: {
         centAmount: number;
       };
+      discounted?: {
+        value: {
+          centAmount: number;
+        };
+      };
     }[];
   };
 }
@@ -43,6 +48,7 @@ interface MainPageProduct {
   author?: string;
   image?: string;
   price: number;
+  discountPrice: number;
 }
 
 interface ProductDetails {
@@ -71,6 +77,7 @@ const ConvertToMainPageProductData = (products: RawProduct[]): MainPageProduct[]
     author: product.masterVariant.attributes[0]?.value,
     image: product.masterVariant.images[0]?.url,
     price: (product.masterVariant.prices[0]?.value.centAmount ?? 0) / 100,
+    discountPrice: (product.masterVariant.prices[0]?.discounted?.value.centAmount ?? 0) / 100,
   }));
 };
 
@@ -99,12 +106,19 @@ const ConvertToProductDetailData = (product: RawProduct): ProductDetails => {
   };
 };
 
-export async function GetProducts(sortOption?: string): Promise<MainPageProduct[] | null> {
+export async function GetProducts(
+  sortOption?: string,
+  searchQuery?: string
+): Promise<MainPageProduct[] | null> {
   const initialToken = localStorage.getItem('initial_token');
   const tokenValue = `Bearer ${initialToken}`;
   let url = `${host}/${projectKey}/product-projections`;
 
-  if (sortOption) {
+  if (sortOption && searchQuery) {
+    url = `${url}/search?sort=${sortOption}&text.en-US=${searchQuery}`;
+  } else if (searchQuery) {
+    url = `${url}/search?text.en-US=${searchQuery}`;
+  } else if (sortOption) {
     url = `${url}/search?sort=${sortOption}`;
   }
 
