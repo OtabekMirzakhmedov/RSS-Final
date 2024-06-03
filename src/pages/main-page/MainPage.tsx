@@ -149,19 +149,18 @@ function MainPage() {
             <Grid container spacing={2} display='flex'>
               {products.map((product) => (
                 <Grid item key={product.id} xs={12} sm={6} md={6} lg={3}>
-                  <Card
-                    onClick={() => navigate(`/product/${product.id}`)}
-                    style={{ cursor: 'pointer', height: '100%' }}
-                  >
+                  <Card onClick={() => navigate(`/product/${product.id}`)} className='card'>
                     {product.image && (
-                      <CardMedia
-                        component='img'
-                        height='500'
-                        image={product.image}
-                        alt={product.title}
-                      />
+                      <Box className='box-img'>
+                        <CardMedia
+                          component='img'
+                          height='500'
+                          image={product.image}
+                          alt={product.title}
+                        />
+                      </Box>
                     )}
-                    <CardContent>
+                    <CardContent className='card-content'>
                       <Typography variant='h6'>{product.title}</Typography>
                       <Typography variant='body2' color='textSecondary'>
                         Author: {product.author}
