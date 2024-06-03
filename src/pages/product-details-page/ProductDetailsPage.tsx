@@ -62,6 +62,11 @@ function ProductDetailsPage() {
     setSelectedIndex(index);
     setOpenDialog(true);
   };
+  const handleSmallImageClick = (imageUrl: string, index: number) => {
+    setMainImage(imageUrl);
+    setSelectedIndex(index);
+  };
+
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -153,7 +158,7 @@ function ProductDetailsPage() {
                         cursor: 'pointer',
                         border: mainImage === image ? '2px solid blue' : 'none',
                       }}
-                      onClick={() => handleImageClick(image, index)}
+                      onClick={() => handleSmallImageClick(image, index)}
                     >
                       <CardMedia component='img' src={image} alt={product.title} height='80' />
                     </Paper>
