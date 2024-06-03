@@ -28,6 +28,11 @@ interface RawProduct {
       };
     }[];
     prices: {
+      discounted: {
+        value: {
+          centAmount: number;
+        };
+      };
       id: string;
       key: string;
       value: {
@@ -37,12 +42,13 @@ interface RawProduct {
   };
 }
 
-interface MainPageProduct {
+export interface MainPageProduct {
   id: string;
   title: string;
   author?: string;
   image?: string;
   price: number;
+  discount?: number;
 }
 
 interface ProductDetails {
@@ -71,6 +77,7 @@ const ConvertToMainPageProductData = (products: RawProduct[]): MainPageProduct[]
     author: product.masterVariant.attributes[0]?.value,
     image: product.masterVariant.images[0]?.url,
     price: (product.masterVariant.prices[0]?.value.centAmount ?? 0) / 100,
+    discount: (product.masterVariant.prices[0]?.discounted?.value.centAmount ?? 0) / 100,
   }));
 };
 
@@ -116,9 +123,9 @@ export async function GetProducts(sortOption?: string): Promise<MainPageProduct[
     });
 
     const productData = response.data;
-    console.log(productData.results);
+    // console.log(productData.results);
     const cleanedProducts = ConvertToMainPageProductData(productData.results);
-    console.log(cleanedProducts);
+    // console.log(cleanedProducts);
     return cleanedProducts;
   } catch (error) {
     console.error('Error fetching products:', error);
