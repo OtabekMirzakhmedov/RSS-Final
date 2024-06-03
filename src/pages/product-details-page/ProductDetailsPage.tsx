@@ -8,6 +8,8 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Box,
+  Paper,
 } from '@mui/material';
 import Header from '../../components/header/Header';
 import { GetProductById } from '../../service/ProductService';
@@ -29,6 +31,7 @@ function ProductDetailsPage() {
   const [product, setProduct] = useState<ProductDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mainImage, setMainImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -36,6 +39,11 @@ function ProductDetailsPage() {
       const productDetails = await GetProductById(productId!);
       if (productDetails) {
         setProduct(productDetails);
+        setMainImage(
+          productDetails.images && productDetails.images.length > 0
+            ? productDetails.images[0]
+            : null
+        );
       } else {
         setError('Failed to fetch product details');
       }
@@ -45,6 +53,10 @@ function ProductDetailsPage() {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchProductDetails();
   }, [productId]);
+
+  const handleImageClick = (imageUrl: string) => {
+    setMainImage(imageUrl);
+  };
 
   if (loading) {
     return (
@@ -106,13 +118,39 @@ function ProductDetailsPage() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
             <Card style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {product.images && product.images.length > 0 && (
+              {mainImage && (
                 <CardMedia
                   component='img'
-                  src={product.images[0]}
+                  src={mainImage}
                   alt={product.title}
-                  height='400'
+                  style={{
+                    maxWidth: '100%',
+                    height: 'auto',
+                    maxHeight: 400,
+                    objectFit: 'contain',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => handleImageClick(mainImage)}
                 />
+              )}
+              {product.images && product.images.length > 1 && (
+                <Box mt={2} display='flex' justifyContent='center'>
+                  {product.images.map((image, index) => (
+                    <Paper
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={index}
+                      style={{
+                        margin: '0 5px',
+                        padding: '5px',
+                        cursor: 'pointer',
+                        border: mainImage === image ? '2px solid blue' : 'none',
+                      }}
+                      onClick={() => handleImageClick(image)}
+                    >
+                      <CardMedia component='img' src={image} alt={product.title} height='80' />
+                    </Paper>
+                  ))}
+                </Box>
               )}
             </Card>
           </Grid>
