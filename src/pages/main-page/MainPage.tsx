@@ -23,16 +23,10 @@ import {
   TextField,
 } from '@mui/material';
 import Header from '../../components/header/Header';
-import { GetProducts } from '../../service/ProductService';
 
-interface MainPageProduct {
-  id: string;
-  title: string;
-  author?: string;
-  image?: string;
-  price: number;
-  discountPrice: number;
-}
+import { GetProducts, MainPageProduct } from '../../service/ProductService';
+import './mainPage.scss';
+
 
 function MainPage() {
   const [products, setProducts] = useState<MainPageProduct[]>([]);
@@ -153,17 +147,17 @@ function MainPage() {
                 </Select>
               </FormControl>
             </div>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} display='flex'>
               {products.map((product) => (
                 <Grid item key={product.id} xs={12} sm={6} md={4}>
                   <Card
                     onClick={() => navigate(`/product/${product.id}`)}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', height: '100%' }}
                   >
                     {product.image && (
                       <CardMedia
                         component='img'
-                        height='350'
+                        height='450'
                         image={product.image}
                         alt={product.title}
                       />
@@ -173,12 +167,20 @@ function MainPage() {
                       <Typography variant='body2' color='textSecondary'>
                         Author: {product.author}
                       </Typography>
-                      <Typography variant='body2' color='textPrimary'>
-                        Price: ${product.price.toFixed(2)}
-                      </Typography>
-                      <Typography variant='body2' color='textPrimary'>
-                        Price: ${product.discountPrice.toFixed(2)}
-                      </Typography>
+                      {product.discount ? (
+                        <Box display='flex' justifyContent='space-between'>
+                          <Typography variant='body2' color='textPrimary' className='old-price'>
+                            Price: ${product.price.toFixed(2)}
+                          </Typography>
+                          <Typography variant='body2' color='green' fontSize='18px'>
+                            Price: ${product.discount.toFixed(2)}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Typography variant='body2' color='textPrimary'>
+                          Price: ${product.price.toFixed(2)}
+                        </Typography>
+                      )}
                     </CardContent>
                   </Card>
                 </Grid>
