@@ -10,6 +10,11 @@ import {
   CardMedia,
   Box,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from '@mui/material';
 import Header from '../../components/header/Header';
 import { GetProductById } from '../../service/ProductService';
@@ -31,7 +36,9 @@ function ProductDetailsPage() {
   const [product, setProduct] = useState<ProductDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mainImage, setMainImage] = useState<string | null>(null);
+  const [mainImage, setMainImage] = useState<string>('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -39,11 +46,7 @@ function ProductDetailsPage() {
       const productDetails = await GetProductById(productId!);
       if (productDetails) {
         setProduct(productDetails);
-        setMainImage(
-          productDetails.images && productDetails.images.length > 0
-            ? productDetails.images[0]
-            : null
-        );
+        setMainImage(productDetails.images![0]!);
       } else {
         setError('Failed to fetch product details');
       }
@@ -54,8 +57,14 @@ function ProductDetailsPage() {
     fetchProductDetails();
   }, [productId]);
 
-  const handleImageClick = (imageUrl: string) => {
+  const handleImageClick = (imageUrl: string, index: number) => {
     setMainImage(imageUrl);
+    setSelectedIndex(index);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
   if (loading) {
@@ -128,24 +137,23 @@ function ProductDetailsPage() {
                     height: 'auto',
                     maxHeight: 400,
                     objectFit: 'contain',
-                    cursor: 'pointer',
+                    cursor: 'zoom-in',
                   }}
-                  onClick={() => handleImageClick(mainImage)}
+                  onClick={() => handleImageClick(mainImage, 0)}
                 />
               )}
               {product.images && product.images.length > 1 && (
                 <Box mt={2} display='flex' justifyContent='center'>
                   {product.images.map((image, index) => (
                     <Paper
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={index}
+                      key={image}
                       style={{
                         margin: '0 5px',
                         padding: '5px',
                         cursor: 'pointer',
                         border: mainImage === image ? '2px solid blue' : 'none',
                       }}
-                      onClick={() => handleImageClick(image)}
+                      onClick={() => handleImageClick(image, index)}
                     >
                       <CardMedia component='img' src={image} alt={product.title} height='80' />
                     </Paper>
@@ -183,6 +191,38 @@ function ProductDetailsPage() {
           </Grid>
         </Grid>
       </Container>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>{product.title}</DialogTitle>
+        <DialogContent>
+          <Box display='flex' justifyContent='center' alignItems='center'>
+            <CardMedia
+              component='img'
+              src={product.images && product.images.length > 0 ? product.images[selectedIndex] : ''}
+              alt={product.title}
+              style={{ maxWidth: '100%', maxHeight: 600, objectFit: 'contain' }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          {product.images && product.images.length > 1 && (
+            <Box display='flex' justifyContent='center' alignItems='center'>
+              {product.images.map((image, index) => (
+                <Button
+                  key={image}
+                  onClick={() => setSelectedIndex(index)}
+                  variant={selectedIndex === index ? 'contained' : 'outlined'}
+                  color='primary'
+                >
+                  {index + 1}
+                </Button>
+              ))}
+            </Box>
+          )}
+          <Button onClick={handleCloseDialog} color='primary'>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
