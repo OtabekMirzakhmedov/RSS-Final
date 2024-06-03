@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
@@ -19,10 +20,13 @@ import {
   FormControl,
   InputLabel,
   SelectChangeEvent,
+  TextField,
 } from '@mui/material';
 import Header from '../../components/header/Header';
+
 import { GetProducts, MainPageProduct } from '../../service/ProductService';
 import './mainPage.scss';
+
 
 function MainPage() {
   const [products, setProducts] = useState<MainPageProduct[]>([]);
@@ -30,28 +34,31 @@ function MainPage() {
   const [error, setError] = useState<Error | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [sortOption, setSortOption] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [triggerSearch, setTriggerSearch] = useState<number>(0); // New state for search trigger
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const fetchedProducts = await GetProducts(sortOption);
-        if (fetchedProducts) {
-          setProducts(fetchedProducts);
-        } else {
-          setError(new Error('Failed to fetch products'));
-        }
-      } catch (fetchError) {
-        setError(fetchError as Error);
-      } finally {
-        setLoading(false);
+  const fetchProducts = async (sortOption: string, searchQuery: string) => {
+    setLoading(true);
+    try {
+      const fetchedProducts = await GetProducts(sortOption, searchQuery);
+      if (fetchedProducts) {
+        setProducts(fetchedProducts);
+      } else {
+        setError(new Error('Failed to fetch products'));
       }
-    };
+    } catch (fetchError) {
+      setError(fetchError as Error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchProducts();
-  }, [sortOption]);
+    fetchProducts(sortOption, searchQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sortOption, triggerSearch]);
 
   const toggleDrawer = (open: boolean) => () => {
     setIsDrawerOpen(open);
@@ -59,6 +66,14 @@ function MainPage() {
 
   const handleSortChange = (event: SelectChangeEvent<string>) => {
     setSortOption(event.target.value);
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleSearchClick = () => {
+    setTriggerSearch((prev) => prev + 1);
   };
 
   if (loading) {
@@ -97,6 +112,19 @@ function MainPage() {
               <Typography variant='h4' gutterBottom>
                 MainPage
               </Typography>
+              <div>
+                <TextField
+                  label='Search'
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  variant='outlined'
+                  size='small'
+                  style={{ marginRight: '10px' }}
+                />
+                <Button variant='contained' onClick={handleSearchClick}>
+                  Search
+                </Button>
+              </div>
               <Button
                 variant='outlined'
                 onClick={toggleDrawer(true)}

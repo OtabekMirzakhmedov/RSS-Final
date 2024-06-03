@@ -38,6 +38,11 @@ interface RawProduct {
       value: {
         centAmount: number;
       };
+      discounted?: {
+        value: {
+          centAmount: number;
+        };
+      };
     }[];
   };
 }
@@ -106,12 +111,19 @@ const ConvertToProductDetailData = (product: RawProduct): ProductDetails => {
   };
 };
 
-export async function GetProducts(sortOption?: string): Promise<MainPageProduct[] | null> {
+export async function GetProducts(
+  sortOption?: string,
+  searchQuery?: string
+): Promise<MainPageProduct[] | null> {
   const initialToken = localStorage.getItem('initial_token');
   const tokenValue = `Bearer ${initialToken}`;
   let url = `${host}/${projectKey}/product-projections`;
 
-  if (sortOption) {
+  if (sortOption && searchQuery) {
+    url = `${url}/search?sort=${sortOption}&text.en-US=${searchQuery}`;
+  } else if (searchQuery) {
+    url = `${url}/search?text.en-US=${searchQuery}`;
+  } else if (sortOption) {
     url = `${url}/search?sort=${sortOption}`;
   }
 
