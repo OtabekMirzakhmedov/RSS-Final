@@ -3,15 +3,27 @@
 
 import axios, { AxiosResponse } from 'axios';
 
+interface AddressType {
+  id: string;
+  streetName: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  default?: string;
+}
+
 interface UserResponse {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
   password: string;
-  addresses: [];
-  shippingAddressIds: [];
-  billingAddressIds: [];
+  dateOfBirth: string;
+  addresses: AddressType[];
+  defaultBillingAddressId: string;
+  defaultShippingAddressId: string;
+  shippingAddressIds: string[];
+  billingAddressIds: string[];
 }
 
 const projectKey = 'rss-final-commerce';

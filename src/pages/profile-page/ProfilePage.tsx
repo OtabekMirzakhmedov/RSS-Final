@@ -5,8 +5,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Routes } from '../pages-types/pageTypes';
 import { getUser } from '../../service/ProfileService';
 import Header from '../../components/header/Header';
-import StandardProfilMode from './StandardProfileMode';
+import StandardProfileMode from './StandardProfileMode';
 import EditProfileMode from './EditProfileMode';
+
+interface AddressType {
+  id: string;
+  streetName: string;
+  postalCode: string;
+  city: string;
+  country: string;
+}
 
 interface UserData {
   id: string;
@@ -14,9 +22,12 @@ interface UserData {
   firstName: string;
   lastName: string;
   password: string;
-  addresses: [];
-  shippingAddressIds: [];
-  billingAddressIds: [];
+  dateOfBirth: string;
+  addresses: AddressType[];
+  defaultBillingAddressId: string;
+  defaultShippingAddressId: string;
+  shippingAddressIds: string[];
+  billingAddressIds: string[];
 }
 function ProfilePage() {
   const navigate = useNavigate();
@@ -54,10 +65,10 @@ function ProfilePage() {
       {editMode ? (
         <EditProfileMode exitEditMode={exitEditMode} />
       ) : (
-        <StandardProfilMode enterEditMode={enterEditMode} data={data} />
+        <StandardProfileMode enterEditMode={enterEditMode} data={data} />
       )}
       <Button style={{ marginTop: 20 }} variant='contained' color='primary' component={Link} to='/'>
-        Home
+        Return
       </Button>
     </div>
   );

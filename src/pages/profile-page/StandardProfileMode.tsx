@@ -1,13 +1,4 @@
-import {
-  Avatar,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Grid,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Avatar, Button, Card, CardContent, CardHeader, Grid, Typography } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import EditIcon from '@mui/icons-material/Edit';
 
@@ -16,27 +7,71 @@ interface Props {
   data: UserData | null;
 }
 
+interface AddressType {
+  id: string;
+  streetName: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  default?: string;
+}
+
 interface UserData {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
+  dateOfBirth: string;
   password: string;
-  addresses: [];
-  shippingAddressIds: [];
-  billingAddressIds: [];
+  addresses: AddressType[];
+  defaultBillingAddressId: string;
+  defaultShippingAddressId: string;
+  shippingAddressIds: string[];
+  billingAddressIds: string[];
 }
 
-function StandardProfilMode({ enterEditMode, data }: Props) {
+function StandardProfileMode({ enterEditMode, data }: Props) {
   const editClickHandler = () => {
     enterEditMode();
   };
 
+  const shippingAddresses: AddressType[] = [];
+  data?.shippingAddressIds.forEach((id) => {
+    data.addresses.forEach((address) => {
+      if (id === address.id) {
+        if (data.defaultShippingAddressId === id) {
+          // eslint-disable-next-line no-param-reassign
+          address.default = 'default';
+        }
+        shippingAddresses.push(address);
+      }
+    });
+  });
+
+  const billingAddresses: AddressType[] = [];
+  data?.shippingAddressIds.forEach((id) => {
+    data.addresses.forEach((address) => {
+      if (id === address.id) {
+        if (data.defaultBillingAddressId === id) {
+          // eslint-disable-next-line no-param-reassign
+          address.default = 'default';
+        }
+        billingAddresses.push(address);
+      }
+    });
+  });
+
   return (
     <div style={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
-        <Grid container alignItems='center' item xs={12}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Grid alignItems='center' item xs={12}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <PersonIcon />
             </Avatar>
@@ -57,77 +92,36 @@ function StandardProfilMode({ enterEditMode, data }: Props) {
           <Card>
             <CardHeader title='Personal' />
             <CardContent>
-              <Grid item xs='auto'>
-                <TextField
-                  label='First Name'
-                  value={data?.firstName}
-                  disabled
-                  fullWidth
-                  margin='normal'
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label='Last Name'
-                  fullWidth
-                  id='lastName'
-                  value={data?.lastName}
-                  disabled
-                  margin='normal'
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label='Date of birth'
-                  fullWidth
-                  id='birthDate'
-                  type='text'
-                  value={localStorage.getItem('bthday')}
-                  disabled
-                  margin='normal'
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label='Email'
-                  id='email'
-                  type='text'
-                  value={data?.email}
-                  disabled
-                  margin='normal'
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label='Password'
-                  fullWidth
-                  type='password'
-                  id='password'
-                  value={data?.password}
-                  disabled
-                  margin='normal'
-                />
-              </Grid>
+              <Typography>
+                {data?.firstName} {data?.lastName}
+              </Typography>
+              <Typography>{data?.dateOfBirth}</Typography>
+              <Typography>{data?.email}</Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={6}>
           <Card>
-            <CardHeader title='Addresses' />
+            <CardHeader title='Contacts' />
             <CardContent>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    disabled
-                    value={data?.addresses}
-                    type='text'
-                    id='street'
-                    margin='normal'
-                  />
-                </Grid>
-              </Grid>
+              <h3>Shipping Addresses</h3>
+              {shippingAddresses.map((el: AddressType) => (
+                <div key={el.id}>
+                  <span key={el.id}>
+                    {el.country}, {el.city}, {el.streetName}, {el.postalCode}
+                  </span>
+                  <span style={{ color: 'blue', marginLeft: '8px' }}>{el.default}</span>
+                </div>
+              ))}
+              <h3>Billing Addresses</h3>
+              {billingAddresses.map((el: AddressType) => (
+                <div key={el.id}>
+                  <span>
+                    {el.country}, {el.city}, {el.streetName}, {el.postalCode}
+                  </span>
+                  <span style={{ color: 'blue', marginLeft: '8px' }}>{el.default}</span>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </Grid>
@@ -136,4 +130,4 @@ function StandardProfilMode({ enterEditMode, data }: Props) {
   );
 }
 
-export default StandardProfilMode;
+export default StandardProfileMode;
