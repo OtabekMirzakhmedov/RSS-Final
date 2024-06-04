@@ -15,6 +15,7 @@ import ButtonRegister from '../buttons/button-register/ButtonRegister';
 import ButtonLogout from '../buttons/button-logout/ButtonLogout';
 import ButtonCatalog from '../buttons/button-catalog/ButtonCatalog';
 import './header.scss';
+import ButtonProfile from '../buttons/button-profile/ButtonProfile';
 
 function Header() {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ function Header() {
         <Box className='button-box' sx={{ display: { xs: 'none', sm: 'flex' } }}>
           {isLoggedin ? (
             <>
+              <ButtonProfile />
               <ButtonCatalog />
               <ButtonLogout />
             </>
