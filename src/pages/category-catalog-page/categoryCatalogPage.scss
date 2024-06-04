@@ -1,0 +1,54 @@
+.card {
+    height: 100%;
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+  
+    .box-img {
+      position: relative;
+  
+      &::before {
+        content: '';
+        background: none;
+        transition:
+          background 0.5s ease,
+          content 0.5s ease;
+      }
+    }
+  
+    .card-content {
+      height: 100%;
+      transition:
+        background-color,
+        0.5s ease,
+        color,
+        0.5s ease;
+    }
+  
+    &:hover {
+      .card-content {
+        color: white;
+        background-color: rgb(166, 92, 240);
+      }
+  
+      .box-img::before {
+        content: 'click';
+        color: white;
+        font-size: 24px;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        z-index: 1;
+        height: 100%;
+        width: 100%;
+        background: rgba(18, 23, 35, 0.8);
+      }
+    }
+  
+    .old-price {
+      text-decoration: line-through;
+      color: grey;
+    }
+  }
+  

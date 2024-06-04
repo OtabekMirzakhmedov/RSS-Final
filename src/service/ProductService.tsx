@@ -113,7 +113,11 @@ export async function GetProducts(
   searchQuery?: string
 ): Promise<MainPageProduct[] | null> {
   const initialToken = localStorage.getItem('initial_token');
-  const tokenValue = `Bearer ${initialToken}`;
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
   let url = `${host}/${projectKey}/product-projections`;
 
   if (sortOption && searchQuery) {
@@ -161,6 +165,45 @@ export async function GetProductById(productId: string): Promise<ProductDetails 
     return cleanedProduct;
   } catch (error) {
     console.error('Error fetching product:', error);
+    return null;
+  }
+}
+
+export async function GetCategoryProducts(
+  categoryId: string,
+  sortOption?: string,
+  searchQuery?: string
+): Promise<MainPageProduct[] | null> {
+  const initialToken = localStorage.getItem('initial_token');
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
+  let url = `${host}/${projectKey}/product-projections/search?filter=categories.id:"${categoryId}"`;
+
+  if (sortOption && searchQuery) {
+    url = `${url}&sort=${sortOption}&text.en-US=${searchQuery}`;
+  } else if (searchQuery) {
+    url = `${url}&text.en-US=${searchQuery}`;
+  } else if (sortOption) {
+    url = `${url}&sort=${sortOption}`;
+  }
+
+  try {
+    const response = await axios.get<ProductResponse>(url, {
+      headers: {
+        Authorization: tokenValue,
+      },
+    });
+
+    const productData = response.data;
+    // console.log(productData.results);
+    const cleanedProducts = ConvertToMainPageProductData(productData.results);
+    // console.log(cleanedProducts);
+    return cleanedProducts;
+  } catch (error) {
+    console.error('Error fetching products:', error);
     return null;
   }
 }
