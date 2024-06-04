@@ -44,10 +44,15 @@ function ProfilePage() {
 
   const getUserInfo = async () => {
     const userData = await getUser();
-    if (userData !== null) {
+    if (userData) {
       setData(userData);
     }
   };
+
+  const updateData = (updatedData: UserData) => {
+    setData(updatedData);
+  };
+
   useEffect(() => {
     getUserInfo();
   }, []);
@@ -63,12 +68,12 @@ function ProfilePage() {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Header />
       {editMode ? (
-        <EditProfileMode exitEditMode={exitEditMode} />
+        <EditProfileMode exitEditMode={exitEditMode} data={data} updateData={updateData} />
       ) : (
         <StandardProfileMode enterEditMode={enterEditMode} data={data} />
       )}
-      <Button style={{ marginTop: 20 }} variant='contained' color='primary' component={Link} to='/'>
-        Return
+      <Button style={{ margin: 10 }} variant='contained' color='primary' component={Link} to='/'>
+        Home page
       </Button>
     </div>
   );

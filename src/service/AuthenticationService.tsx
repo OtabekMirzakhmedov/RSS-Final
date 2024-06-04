@@ -28,6 +28,7 @@ interface SignupData {
 interface CreateUserResponse {
   customer: {
     id: string;
+    version: number;
   };
 }
 
@@ -43,6 +44,7 @@ interface EmailVerifyResponse {
   results: [
     {
       id: string;
+      version: number;
     },
   ];
 }
@@ -137,6 +139,7 @@ export const checkEmail = async (emailAddress: string, password: string) => {
       errorText = 'No error!';
       console.log(response.data.results[0].id);
       localStorage.setItem('id', response.data.results[0].id);
+      localStorage.setItem('version', response.data.results[0].version.toString());
       const resp = await login(emailAddress, password);
       if (resp === ResponseCode.BadRequest) {
         errorText = ResponseCheck.WrongPassword;
@@ -169,6 +172,7 @@ export const createAccount = async (signUpData: SignupData): Promise<ApiResponse
     const resp = await axios.request<CreateUserResponse>(config);
     console.log(resp.data);
     localStorage.setItem('id', resp.data.customer.id);
+    localStorage.setItem('version', resp.data.customer.version.toString());
     return {
       success: true,
       message: 'Account created successfully!',

@@ -36,7 +36,7 @@ export default function SimpleSnackbar({ text, closeModal }: Props) {
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={open}
-        autoHideDuration={5000}
+        autoHideDuration={6000}
         onClose={handleClose}
         message='Error!'
         action={action}
