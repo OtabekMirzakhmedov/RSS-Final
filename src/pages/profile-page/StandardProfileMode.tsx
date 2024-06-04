@@ -89,7 +89,7 @@ function StandardProfileMode({ enterEditMode, data }: Props) {
           </div>
         </Grid>
         <Grid item xs={6}>
-          <Card>
+          <Card style={{ height: '100%' }}>
             <CardHeader title='Personal' />
             <CardContent>
               <Typography>
@@ -101,7 +101,7 @@ function StandardProfileMode({ enterEditMode, data }: Props) {
           </Card>
         </Grid>
         <Grid item xs={6}>
-          <Card>
+          <Card style={{ height: '100%' }}>
             <CardHeader title='Contacts' />
             <CardContent>
               <h3>Shipping Addresses</h3>

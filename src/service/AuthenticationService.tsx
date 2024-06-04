@@ -170,7 +170,6 @@ export const createAccount = async (signUpData: SignupData): Promise<ApiResponse
 
   try {
     const resp = await axios.request<CreateUserResponse>(config);
-    console.log(resp.data);
     localStorage.setItem('id', resp.data.customer.id);
     localStorage.setItem('version', resp.data.customer.version.toString());
     return {
