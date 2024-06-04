@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 /* eslint-disable no-console */
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
@@ -10,6 +9,12 @@ interface AddressType {
   city: string;
   country: string;
   default?: string;
+}
+
+interface PasswordForm {
+  password: string;
+  repeatPassword: string;
+  currentPassword: string;
 }
 
 interface UserResponse {
@@ -92,4 +97,47 @@ export const updateUser = async (actions: PersonalActionType[]) => {
   );
   result = response.data.version;
   localStorage.setItem('version', result.toString());
+};
+
+export const updatePassword = async (data: PasswordForm) => {
+  let result = null;
+  const id = localStorage.getItem('id');
+  const versionString = localStorage?.getItem('version');
+  const version = Number(versionString);
+
+  try {
+    const response: AxiosResponse<UpdateResponse> = await axios.post<UpdateResponse>(
+      `${host}/${projectKey}/customers/password`,
+      {
+        id,
+        version,
+        currentPassword: data.currentPassword,
+        newPassword: data.repeatPassword,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+    result = response.data.version;
+    localStorage.setItem('version', result.toString());
+
+    return {
+      success: true,
+      message: 'Password changed successfully!',
+    };
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+    return {
+      success: false,
+      message: 'An error occurred during password changing.',
+    };
+  }
 };

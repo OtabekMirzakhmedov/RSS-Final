@@ -1,16 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import {
-  Box,
-  Button,
-  Container,
-  CssBaseline,
-  Grid,
-  IconButton,
-  InputAdornment,
-  TextField,
-} from '@mui/material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Box, Button, Container, CssBaseline, Grid, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +7,7 @@ import FormValidationMessages from '../pages-types/validateTypes';
 import { Routes } from '../pages-types/pageTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { getUser, updateUser } from '../../service/ProfileService';
+import PasswordModal from './PasswordModal';
 
 interface Props {
   exitEditMode: () => void;
@@ -77,11 +67,17 @@ interface PersonalActionType {
 }
 
 function EditProfileMode({ exitEditMode, data, updateData }: Props) {
-  const [showPassword, setShowPassword] = useState(false);
-  const handleTogglePasswordVisibility = (): void => {
-    setShowPassword((prevShowPassword) => !prevShowPassword);
-  };
   const navigate = useNavigate();
+
+  const backBtnHandler = async () => {
+    const userData = await getUser();
+    if (userData) {
+      updateData(userData);
+    }
+    exitEditMode();
+    navigate(Routes.PROFILE);
+  };
+
   const {
     register,
     handleSubmit,
@@ -90,11 +86,23 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   } = useForm<RegisterField>({
     mode: 'onChange',
   });
-  const [snackbarNeeded, setSnackbarNeeded] = useState(false);
+  const [personalSnackbarNeeded, setPersonalSnackbarNeeded] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [wrongPersonalSnackbarNeeded, setWrongPersonalSnackbarNeeded] = useState(false);
   const snackbarClose = () => {
-    setSnackbarNeeded(false);
+    setPersonalSnackbarNeeded(false);
   };
-  const password = watch('password');
+
+  const passwordModalHandler = () => {
+    setPasswordModalOpen(true);
+    console.log(passwordModalOpen);
+  };
+
+  const setPasswordModalFalse = () => {
+    setPasswordModalOpen(false);
+    console.log(passwordModalOpen);
+  };
+
   const firstName = watch('firstName');
   const lastName = watch('lastName');
   const bthday = watch('birthDate');
@@ -173,16 +181,14 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
     }
 
     try {
-      await updateUser(actions);
-      setSnackbarNeeded(true);
-      const userData = await getUser();
-      if (userData) {
-        updateData(userData);
+      if (actions.length > 0) {
+        await updateUser(actions);
+        setPersonalSnackbarNeeded(true);
+      } else {
+        setWrongPersonalSnackbarNeeded(true);
       }
-      exitEditMode();
-      navigate(Routes.PROFILE);
     } catch (err) {
-      setSnackbarNeeded(false);
+      setPersonalSnackbarNeeded(false);
     }
   };
 
@@ -197,7 +203,7 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
           alignItems: 'flex-start',
         }}
       >
-        <Button style={{ alignSelf: 'flex-start' }} onClick={() => exitEditMode()}>
+        <Button style={{ alignSelf: 'flex-start' }} onClick={() => backBtnHandler()}>
           Go back
         </Button>
         <form onSubmit={handleSubmit(onPersonalSubmit)}>
@@ -302,65 +308,31 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
           >
             Save personal changes
           </Button>
-        </form>
-        <form>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label='Password'
-              type={showPassword ? 'text' : 'password'}
-              id='password'
-              autoComplete='new-password'
-              {...register('password', {
-                minLength: {
-                  value: 8,
-                  message: FormValidationMessages.Password.MinLength,
-                },
-                pattern: {
-                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
-                  message: FormValidationMessages.Password.Pattern,
-                },
-              })}
-              error={!!errors.password}
-              helperText={errors.password ? errors.password.message : ''}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton onClick={handleTogglePasswordVisibility}>
-                      {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label='Confirm password'
-              type='password'
-              id='repeatPassword'
-              autoComplete='new-password'
-              {...register('repeatPassword', {
-                validate: (value) => value === password || FormValidationMessages.Password.NotMatch,
-              })}
-              error={!!errors.repeatPassword}
-              helperText={errors.repeatPassword ? errors.repeatPassword.message : ''}
-            />
-          </Grid>
           <Button
-            type='submit'
-            style={{ margin: 10, alignSelf: 'flex-end' }}
+            type='button'
+            onClick={passwordModalHandler}
+            style={{ margin: 10, alignSelf: 'center' }}
+            color='warning'
             variant='contained'
-            color='secondary'
           >
             Change password
           </Button>
         </form>
-        {snackbarNeeded && (
-          <SimpleSnackbar text='Changed successfully!' closeModal={snackbarClose} />
+        {passwordModalOpen && <PasswordModal setPasswordModalFalse={setPasswordModalFalse} />}
+        {personalSnackbarNeeded && (
+          <SimpleSnackbar
+            colorName='success'
+            text='Changes are saved successfully!'
+            closeModal={snackbarClose}
+          />
         )}
-        {/* {!snackbarNeeded && <SimpleSnackbar text='Changes failed!' closeModal={snackbarClose} />} */}
+        {wrongPersonalSnackbarNeeded && (
+          <SimpleSnackbar
+            colorName='error'
+            text='You entered no valid data!'
+            closeModal={snackbarClose}
+          />
+        )}
       </Box>
     </Container>
   );

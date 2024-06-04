@@ -159,6 +159,7 @@ export default function LoginPage() {
           <div>
             {emailModalNeeded && (
               <SimpleSnackbar
+                colorName='success'
                 text='This email is not registered! Please sign up first!'
                 closeModal={closeEmailModal}
               />
@@ -167,6 +168,7 @@ export default function LoginPage() {
           <div>
             {passwordModalNeeded && (
               <SimpleSnackbar
+                colorName='error'
                 text='This password is wrong! Please try again!'
                 closeModal={closePasswordModal}
               />
