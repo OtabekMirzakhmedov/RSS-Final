@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import ButtonLogin from '../buttons/button-login/ButtonLogin';
 import ButtonRegister from '../buttons/button-register/ButtonRegister';
 import ButtonLogout from '../buttons/button-logout/ButtonLogout';
+import ButtonCatalog from '../buttons/button-catalog/ButtonCatalog';
 import './header.scss';
 import ButtonProfile from '../buttons/button-profile/ButtonProfile';
 
@@ -34,11 +35,13 @@ function Header() {
         <Box className='button-box' sx={{ display: { xs: 'none', sm: 'flex' } }}>
           {isLoggedin ? (
             <>
-              <ButtonLogout />
               <ButtonProfile />
+              <ButtonCatalog />
+              <ButtonLogout />
             </>
           ) : (
             <>
+              <ButtonCatalog />
               <ButtonLogin />
               <ButtonRegister />
             </>
@@ -66,11 +69,19 @@ function Header() {
         </IconButton>
         <List>
           {isLoggedin ? (
-            <ListItem>
-              <ButtonLogout />
-            </ListItem>
+            <>
+              <ListItem>
+                <ButtonCatalog />
+              </ListItem>
+              <ListItem>
+                <ButtonLogout />
+              </ListItem>
+            </>
           ) : (
             <>
+              <ListItem>
+                <ButtonCatalog />
+              </ListItem>
               <ListItem>
                 <ButtonLogin />
               </ListItem>

@@ -202,7 +202,7 @@ function ProductDetailsPage() {
               component='img'
               src={product.images && product.images.length > 0 ? product.images[selectedIndex] : ''}
               alt={product.title}
-              style={{ maxWidth: '100%', maxHeight: 600, objectFit: 'contain' }}
+              style={{ maxWidth: '100%', height: 600, objectFit: 'contain' }}
             />
           </Box>
         </DialogContent>
