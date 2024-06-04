@@ -22,7 +22,8 @@ function MainPage() {
           Your one-stop online shop for all your reading needs
         </Typography>
         <Typography variant='h5' gutterBottom>
-          Browse our extensive catalog, find your next favorite book, and enjoy seamless shopping from the comfort of your home.
+          Browse our extensive catalog, find your next favorite book, and enjoy seamless shopping
+          from the comfort of your home.
         </Typography>
         <Typography variant='h5' gutterBottom>
           Discover new releases, bestsellers, and timeless classics.

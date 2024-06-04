@@ -217,7 +217,17 @@ function CatalogPage() {
               <CloseIcon />
             </IconButton>
             <CardContent>
-              <Typography variant='h6'>Filters</Typography>
+              <Card>
+                <Typography variant='h6'>Categories</Typography>
+                <CardContent>
+                  <ListItem>
+                    <Button onClick={() => handleCategoryClick('biography')}>Biography</Button>
+                  </ListItem>
+                  <ListItem>
+                    <Button onClick={() => handleCategoryClick('fiction')}>Fiction</Button>
+                  </ListItem>
+                </CardContent>
+              </Card>
             </CardContent>
           </Box>
         </Drawer>
