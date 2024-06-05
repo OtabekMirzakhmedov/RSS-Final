@@ -9,11 +9,12 @@ import StandardProfileMode from './StandardProfileMode';
 import EditProfileMode from './EditProfileMode';
 
 interface AddressType {
-  id: string;
+  id?: string;
   streetName: string;
   postalCode: string;
   city: string;
   country: string;
+  default?: string;
 }
 
 interface UserData {
@@ -68,7 +69,7 @@ function ProfilePage() {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Header />
       {editMode ? (
-        <EditProfileMode exitEditMode={exitEditMode} data={data} updateData={updateData} />
+        <EditProfileMode exitEditMode={exitEditMode} updateData={updateData} />
       ) : (
         <StandardProfileMode enterEditMode={enterEditMode} data={data} />
       )}

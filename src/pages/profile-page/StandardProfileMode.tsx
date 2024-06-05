@@ -8,7 +8,7 @@ interface Props {
 }
 
 interface AddressType {
-  id: string;
+  id?: string;
   streetName: string;
   postalCode: string;
   city: string;
@@ -49,7 +49,7 @@ function StandardProfileMode({ enterEditMode, data }: Props) {
   });
 
   const billingAddresses: AddressType[] = [];
-  data?.shippingAddressIds.forEach((id) => {
+  data?.billingAddressIds.forEach((id) => {
     data.addresses.forEach((address) => {
       if (id === address.id) {
         if (data.defaultBillingAddressId === id) {

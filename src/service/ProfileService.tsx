@@ -11,6 +11,15 @@ interface AddressType {
   default?: string;
 }
 
+interface AddAddressType {
+  id?: string;
+  streetName: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  default?: string;
+}
+
 interface PasswordForm {
   password: string;
   repeatPassword: string;
@@ -33,6 +42,7 @@ interface UserResponse {
 
 interface UpdateResponse {
   version: number;
+  addresses: AddressType[];
 }
 
 interface PersonalActionType {
@@ -41,6 +51,20 @@ interface PersonalActionType {
   firstName?: string;
   lastName?: string;
   dateOfBirth?: string;
+}
+
+interface AddressActionType {
+  action:
+    | 'removeShippingAddressId'
+    | 'removeBillingAddressId'
+    | 'addShippingAddressId'
+    | 'addBillingAddressId';
+  addressId: string;
+}
+
+interface AddAddressActionType {
+  action: 'addAddress';
+  address: AddAddressType;
 }
 
 const projectKey = 'rss-final-commerce';
@@ -146,4 +170,117 @@ export const updatePassword = async (data: PasswordForm) => {
       message: 'An error occurred during password changing.',
     };
   }
+};
+
+export const deleteAddress = async (actions: AddressActionType[]) => {
+  let result = null;
+  const id = localStorage.getItem('id');
+  const versionString = localStorage?.getItem('version');
+  const version = Number(versionString);
+
+  const response: AxiosResponse<UpdateResponse> = await axios.post<UpdateResponse>(
+    `${host}/${projectKey}/customers/${id}`,
+    {
+      version,
+      actions,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }
+  );
+  result = response.data.version;
+  localStorage.setItem('version', result.toString());
+};
+
+export const addAddress = async (actions: AddAddressActionType[]) => {
+  let result = null;
+  const id = localStorage.getItem('id');
+  const versionString = localStorage?.getItem('version');
+  const version = Number(versionString);
+
+  try {
+    const response: AxiosResponse<UpdateResponse> = await axios.post<UpdateResponse>(
+      `${host}/${projectKey}/customers/${id}`,
+      {
+        version,
+        actions,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    );
+
+    result = response.data.version;
+    localStorage.setItem('version', result.toString());
+    console.log(response.data.addresses.at(-1)?.id);
+
+    return {
+      success: true,
+      message: 'Address added!',
+      newAddressId: response.data.addresses.at(-1)?.id,
+    };
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+    return {
+      success: false,
+      message: 'An error occurred during address creation.',
+    };
+  }
+};
+
+export const addShippingAddress = async (actions: AddressActionType[]) => {
+  let result = null;
+  const id = localStorage.getItem('id');
+  const versionString = localStorage?.getItem('version');
+  const version = Number(versionString);
+
+  const response: AxiosResponse<UpdateResponse> = await axios.post<UpdateResponse>(
+    `${host}/${projectKey}/customers/${id}`,
+    {
+      version,
+      actions,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }
+  );
+  result = response.data.version;
+  localStorage.setItem('version', result.toString());
+};
+
+export const addBillingAddress = async (actions: AddressActionType[]) => {
+  let result = null;
+  const id = localStorage.getItem('id');
+  const versionString = localStorage?.getItem('version');
+  const version = Number(versionString);
+
+  const response: AxiosResponse<UpdateResponse> = await axios.post<UpdateResponse>(
+    `${host}/${projectKey}/customers/${id}`,
+    {
+      version,
+      actions,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }
+  );
+  result = response.data.version;
+  localStorage.setItem('version', result.toString());
 };
