@@ -20,9 +20,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import FormValidationMessages from '../pages-types/validateTypes';
-import { Routes } from '../pages-types/pageTypes';
+import { RoutesPages } from '../pages-types/pageTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { deleteAddress, getUser, updateUser } from '../../service/ProfileService';
 import PasswordModal from './PasswordModal';
@@ -93,7 +93,8 @@ interface AddressActionType {
 function EditProfileMode({ exitEditMode, updateData }: Props) {
   const shippingAddresses: AddressType[] = [];
   const billingAddresses: AddressType[] = [];
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
+
 
   function updateAddresses(changedData: UserData) {
     changedData?.shippingAddressIds.forEach((id) => {
@@ -143,7 +144,7 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
       updateData(userData);
     }
     exitEditMode();
-    navigate(Routes.PROFILE);
+    navigate(RoutesPages.PROFILE);
   };
 
   const {

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, NavigateFunction } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Container,
@@ -30,13 +30,13 @@ import './catalogPage.scss';
 
 function CatalogPage() {
   const [products, setProducts] = useState<MainPageProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [sortOption, setSortOption] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [triggerSearch, setTriggerSearch] = useState<number>(0); // New state for search trigger
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   const fetchProducts = async (sortOption: string, searchQuery: string) => {
     setLoading(true);
