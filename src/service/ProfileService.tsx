@@ -80,13 +80,15 @@ export const getUser = async () => {
     throw new Error('Authorization token is missing');
   }
 
+  console.log(token);
+
   try {
     const response: AxiosResponse<UserResponse> = await axios.get<UserResponse>(
       `${host}/${projectKey}/customers/${id}`,
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem(token)}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
