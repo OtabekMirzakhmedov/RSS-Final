@@ -1,7 +1,7 @@
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../service/AuthenticationService';
-import { Routes } from '../../../pages/pages-types/pageTypes';
+import { RoutesPages } from '../../../pages/pages-types/pageTypes';
 
 export default function ButtonLogout() {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ export default function ButtonLogout() {
     localStorage.clear();
     getAccessToken()
       .then(() => {
-        navigate(Routes.HOME);
+        navigate(RoutesPages.HOME);
       })
       .catch((error) => {
         throw new Error(`Error logging out: ${error}`);

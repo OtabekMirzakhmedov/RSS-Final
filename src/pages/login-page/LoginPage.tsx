@@ -10,7 +10,7 @@ import Header from '../../components/header/Header';
 import FormValidationMessages from '../pages-types/validateTypes';
 import './login.scss';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
-import { ResponseCheck, Routes } from '../pages-types/pageTypes';
+import { ResponseCheck, RoutesPages } from '../pages-types/pageTypes';
 
 interface Inputs {
   email: string;
@@ -23,7 +23,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isLoggedin) {
-      navigate(Routes.HOME);
+      navigate(RoutesPages.HOME);
     }
   }, [isLoggedin, navigate]);
 
@@ -62,14 +62,14 @@ export default function LoginPage() {
     } else if (response === ResponseCheck.WrongPassword.toString()) {
       setPasswordModalNeeded(true);
     } else {
-      navigate(Routes.HOME);
+      navigate(RoutesPages.HOME);
       localStorage.setItem('initial_token', '');
     }
     reset();
   };
 
   const signUpClickHandler = () => {
-    navigate(Routes.REGISTER);
+    navigate(RoutesPages.REGISTER);
   };
 
   return (

@@ -2,7 +2,7 @@
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Routes } from '../pages-types/pageTypes';
+import { RoutesPages } from '../pages-types/pageTypes';
 import { getUser } from '../../service/ProfileService';
 import Header from '../../components/header/Header';
 import StandardProfileMode from './StandardProfileMode';
@@ -35,7 +35,7 @@ function ProfilePage() {
 
   useEffect(() => {
     if (isLoggedin) {
-      navigate(Routes.PROFILE);
+      navigate(RoutesPages.PROFILE);
     }
   }, [isLoggedin, navigate]);
 

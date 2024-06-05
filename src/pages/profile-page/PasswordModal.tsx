@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import FormValidationMessages from '../pages-types/validateTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { updatePassword } from '../../service/ProfileService';
-import { Routes } from '../pages-types/pageTypes';
+import { RoutesPages } from '../pages-types/pageTypes';
 import { getAccessToken } from '../../service/AuthenticationService';
 
 interface PasswordForm {
@@ -79,7 +79,7 @@ export default function PasswordModal({ setPasswordModalFalse }: Props) {
         localStorage.clear();
         getAccessToken()
           .then(() => {
-            navigate(Routes.LOGIN);
+            navigate(RoutesPages.LOGIN);
           })
           .catch((error) => {
             throw new Error(`Error logging out: ${error}`);

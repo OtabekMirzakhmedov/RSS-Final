@@ -32,7 +32,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createAccount, login } from '../../service/AuthenticationService';
 import Header from '../../components/header/Header';
-import { Routes } from '../pages-types/pageTypes';
+import { RoutesPages } from '../pages-types/pageTypes';
 import FormValidationMessages from '../pages-types/validateTypes';
 
 interface RegisterField {
@@ -92,7 +92,7 @@ function RegistrationPage() {
 
   useEffect(() => {
     if (isLoggedin) {
-      navigate(Routes.HOME);
+      navigate(RoutesPages.HOME);
     }
   }, [isLoggedin, navigate]);
 
@@ -181,7 +181,7 @@ function RegistrationPage() {
         setSnackbarMessage('Account created successfully!');
         setSnackbarOpen(true);
         await login(data.email, data.password);
-        navigate(Routes.HOME);
+        navigate(RoutesPages.HOME);
       }
     } catch (err) {
       setLoading(false);
@@ -196,7 +196,7 @@ function RegistrationPage() {
   };
 
   const handleLoginClick = (): void => {
-    navigate(Routes.LOGIN);
+    navigate(RoutesPages.LOGIN);
   };
 
   const handleDefaultBillingAddressChange = (event: React.ChangeEvent<HTMLInputElement>): void => {

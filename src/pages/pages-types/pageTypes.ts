@@ -1,9 +1,12 @@
-export enum Routes {
+export enum RoutesPages {
   HOME = '/',
   LOGIN = '/login',
   REGISTER = '/create-account',
   PROFILE = '/profile',
   CATALOG = '/catalog',
+  GATEGORY = '/catalog/:categoryName',
+  PRODUCT = '/product/:productId',
+  NOTFOUND = '*',
 }
 
 export enum Categories {

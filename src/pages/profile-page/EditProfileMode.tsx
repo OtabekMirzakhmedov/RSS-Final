@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import FormValidationMessages from '../pages-types/validateTypes';
-import { Routes } from '../pages-types/pageTypes';
+import { RoutesPages } from '../pages-types/pageTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { getUser, updateUser } from '../../service/ProfileService';
 import PasswordModal from './PasswordModal';
@@ -75,7 +75,7 @@ function EditProfileMode({ exitEditMode, /* data */ updateData }: Props) {
       updateData(userData);
     }
     exitEditMode();
-    navigate(Routes.PROFILE);
+    navigate(RoutesPages.PROFILE);
   };
 
   const {
