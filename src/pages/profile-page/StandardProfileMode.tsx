@@ -8,7 +8,7 @@ interface Props {
 }
 
 interface AddressType {
-  id: string;
+  id?: string;
   streetName: string;
   postalCode: string;
   city: string;

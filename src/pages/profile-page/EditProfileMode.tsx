@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import {
   Box,
   Button,
@@ -17,7 +18,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import FormValidationMessages from '../pages-types/validateTypes';
@@ -26,10 +27,10 @@ import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { deleteAddress, getUser, updateUser } from '../../service/ProfileService';
 import PasswordModal from './PasswordModal';
 import './profile.css';
+import AddressModal from './AddressModal';
 
 interface Props {
   exitEditMode: () => void;
-  data: UserData | null;
   updateData: (data: UserData) => void;
 }
 
@@ -54,15 +55,6 @@ interface UserData {
   defaultShippingAddressId: string;
   shippingAddressIds: string[];
   billingAddressIds: string[];
-}
-
-interface AddressType {
-  id: string;
-  streetName: string;
-  postalCode: string;
-  city: string;
-  country: string;
-  default?: string;
 }
 
 interface RegisterField {
@@ -93,13 +85,57 @@ interface PersonalActionType {
   dateOfBirth?: string;
 }
 
-interface DeleteAddressAction {
-  action: 'removeShippingAddressId' | 'removeBillingAddressId';
+interface AddressActionType {
+  action: 'removeShippingAddressId' | 'removeBillingAddressId' | 'addShippingAddressId';
   addressId: string;
 }
 
-function EditProfileMode({ exitEditMode, data, updateData }: Props) {
+function EditProfileMode({ exitEditMode, updateData }: Props) {
+  const shippingAddresses: AddressType[] = [];
+  const billingAddresses: AddressType[] = [];
   const navigate = useNavigate();
+
+  function updateAddresses(changedData: UserData) {
+    changedData?.shippingAddressIds.forEach((id) => {
+      changedData.addresses.forEach((address) => {
+        if (id === address.id) {
+          if (changedData.defaultShippingAddressId === id) {
+            // eslint-disable-next-line no-param-reassign
+            address.default = 'default';
+          }
+          shippingAddresses.push(address);
+        }
+      });
+    });
+
+    changedData?.billingAddressIds.forEach((id) => {
+      changedData.addresses.forEach((address) => {
+        if (id === address.id) {
+          if (changedData.defaultBillingAddressId === id) {
+            // eslint-disable-next-line no-param-reassign
+            address.default = 'default';
+          }
+          billingAddresses.push(address);
+        }
+      });
+    });
+  }
+  const [data, setData] = useState<UserData | null>(null);
+
+  const getUserInfo = async () => {
+    const userData = await getUser();
+    if (userData) {
+      setData(userData);
+    }
+  };
+
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
+  if (data) {
+    updateAddresses(data);
+  }
 
   const backBtnHandler = async () => {
     const userData = await getUser();
@@ -120,6 +156,8 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   });
   const [personalSnackbarNeeded, setPersonalSnackbarNeeded] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [addressShippingModalOpen, setAddressShippingModalOpen] = useState(false);
+  const [addressBillingModalOpen, setAddressBillingModalOpen] = useState(false);
   const [wrongPersonalSnackbarNeeded, setWrongPersonalSnackbarNeeded] = useState(false);
   const [deleteAddressSnackbarNeeded, setDeleteAddressSnackbarNeeded] = useState(false);
   const snackbarClose = () => {
@@ -132,6 +170,22 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
 
   const setPasswordModalFalse = () => {
     setPasswordModalOpen(false);
+  };
+
+  const addressShippingModalHandler = () => {
+    setAddressShippingModalOpen(true);
+  };
+
+  const setShippingAddressModalFalse = () => {
+    setAddressShippingModalOpen(false);
+  };
+
+  const addressBillingModalHandler = () => {
+    setAddressBillingModalOpen(true);
+  };
+
+  const setBillingAddressModalFalse = () => {
+    setAddressBillingModalOpen(false);
   };
 
   const firstName = watch('firstName');
@@ -196,9 +250,9 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   };
 
   const shippingDeleteHandler = (value: AddressType) => async () => {
-    const actions: DeleteAddressAction[] = [];
+    const actions: AddressActionType[] = [];
     if (value.id === selectedItem) {
-      const action: DeleteAddressAction = {
+      const action: AddressActionType = {
         action: 'removeShippingAddressId',
         addressId: value.id,
       };
@@ -206,6 +260,7 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
       try {
         await deleteAddress(actions);
         setDeleteAddressSnackbarNeeded(true);
+        getUserInfo();
       } catch (err) {
         setWrongPersonalSnackbarNeeded(true);
       }
@@ -219,9 +274,9 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   };
 
   const billingDeleteHandler = (value: AddressType) => async () => {
-    const actions: DeleteAddressAction[] = [];
+    const actions: AddressActionType[] = [];
     if (`${value.id}-billing` === selectedBillingItem) {
-      const action: DeleteAddressAction = {
+      const action: AddressActionType = {
         action: 'removeBillingAddressId',
         addressId: value.id,
       };
@@ -229,6 +284,10 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
       try {
         await deleteAddress(actions);
         setDeleteAddressSnackbarNeeded(true);
+        getUserInfo();
+        if (data) {
+          updateAddresses(data);
+        }
       } catch (err) {
         setWrongPersonalSnackbarNeeded(true);
       }
@@ -242,31 +301,6 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   const handleBillingToggle = (value: string) => () => {
     setSelectedBillingItem(value === selectedBillingItem ? '' : value);
   };
-
-  const shippingAddresses: AddressType[] = [];
-  data?.shippingAddressIds.forEach((id) => {
-    data.addresses.forEach((address) => {
-      if (id === address.id) {
-        if (data.defaultShippingAddressId === id) {
-          // eslint-disable-next-line no-param-reassign
-          address.default = 'default';
-        }
-        shippingAddresses.push(address);
-      }
-    });
-  });
-  const billingAddresses: AddressType[] = [];
-  data?.billingAddressIds.forEach((id) => {
-    data.addresses.forEach((address) => {
-      if (id === address.id) {
-        if (data.defaultBillingAddressId === id) {
-          // eslint-disable-next-line no-param-reassign
-          address.default = 'default';
-        }
-        billingAddresses.push(address);
-      }
-    });
-  });
 
   return (
     <Container component='main' maxWidth='xs'>
@@ -400,9 +434,22 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
           xs={12}
         >
           <Grid item xs={12}>
-            <Typography style={{ fontWeight: 600, fontSize: '18px' }}>
-              Shipping addresses
-            </Typography>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Typography style={{ fontWeight: 600, fontSize: '18px' }}>
+                Shipping addresses
+              </Typography>
+              <Button
+                size='small'
+                type='button'
+                onClick={addressShippingModalHandler}
+                style={{ margin: 10, alignSelf: 'center' }}
+                color='info'
+                variant='contained'
+              >
+                add new
+              </Button>
+            </div>
+
             <List style={{ width: '100%', minWidth: '410px' }}>
               {shippingAddresses.map((value) => {
                 const labelId = `checkbox-list-label-${value.id}`;
@@ -441,7 +488,21 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
             </List>
           </Grid>
           <Grid item xs={12}>
-            <Typography style={{ fontWeight: 600, fontSize: '18px' }}>Billing addresses</Typography>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Typography style={{ fontWeight: 600, fontSize: '18px' }}>
+                Billing addresses
+              </Typography>
+              <Button
+                size='small'
+                type='button'
+                onClick={addressBillingModalHandler}
+                style={{ margin: 10, alignSelf: 'center' }}
+                color='info'
+                variant='contained'
+              >
+                add new
+              </Button>
+            </div>
             <List style={{ width: '100%', minWidth: '410px' }}>
               {billingAddresses.map((value) => {
                 const labelId = `checkbox-list-label-billing-${value.id}`;
@@ -487,6 +548,20 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
         </Grid>
 
         {passwordModalOpen && <PasswordModal setPasswordModalFalse={setPasswordModalFalse} />}
+        {addressShippingModalOpen && (
+          <AddressModal
+            setAddressModalFalse={setShippingAddressModalFalse}
+            getUserInfo={getUserInfo}
+            actionType='addShippingAddressId'
+          />
+        )}
+        {addressBillingModalOpen && (
+          <AddressModal
+            setAddressModalFalse={setBillingAddressModalFalse}
+            getUserInfo={getUserInfo}
+            actionType='addBillingAddressId'
+          />
+        )}
         {personalSnackbarNeeded && (
           <SimpleSnackbar
             colorName='success'
