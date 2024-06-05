@@ -66,7 +66,7 @@ interface PersonalActionType {
   dateOfBirth?: string;
 }
 
-function EditProfileMode({ exitEditMode, data, updateData }: Props) {
+function EditProfileMode({ exitEditMode, /* data */ updateData }: Props) {
   const navigate = useNavigate();
 
   const backBtnHandler = async () => {
@@ -95,12 +95,10 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
 
   const passwordModalHandler = () => {
     setPasswordModalOpen(true);
-    console.log(passwordModalOpen);
   };
 
   const setPasswordModalFalse = () => {
     setPasswordModalOpen(false);
-    console.log(passwordModalOpen);
   };
 
   const firstName = watch('firstName');
@@ -109,7 +107,7 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   const email = watch('email');
 
   const onPersonalSubmit = async (): Promise<void> => {
-    console.log(data);
+    // console.log(data);
     // const shippingAddress: Address = {
     //   streetName: data.shippingStreet,
     //   city: data.shippingCity,
