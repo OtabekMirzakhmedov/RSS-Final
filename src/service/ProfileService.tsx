@@ -43,6 +43,10 @@ interface PersonalActionType {
   dateOfBirth?: string;
 }
 
+interface DeleteAddressAction {
+  action: 'removeShippingAddressId' | 'removeBillingAddressId';
+  addressId: string;
+}
 const projectKey = 'rss-final-commerce';
 const host = 'https://api.eu-central-1.aws.commercetools.com';
 
@@ -140,4 +144,27 @@ export const updatePassword = async (data: PasswordForm) => {
       message: 'An error occurred during password changing.',
     };
   }
+};
+
+export const deleteAddress = async (actions: DeleteAddressAction[]) => {
+  let result = null;
+  const id = localStorage.getItem('id');
+  const versionString = localStorage?.getItem('version');
+  const version = Number(versionString);
+
+  const response: AxiosResponse<UpdateResponse> = await axios.post<UpdateResponse>(
+    `${host}/${projectKey}/customers/${id}`,
+    {
+      version,
+      actions,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }
+  );
+  result = response.data.version;
+  localStorage.setItem('version', result.toString());
 };

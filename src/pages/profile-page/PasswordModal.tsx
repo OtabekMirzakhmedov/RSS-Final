@@ -74,7 +74,7 @@ export default function PasswordModal({ setPasswordModalFalse }: Props) {
     };
     try {
       const response: Response = await updatePassword(userData);
-      if (!response.success) {
+      if (response.success) {
         setPasswordSnackbarNeeded(true);
         localStorage.clear();
         getAccessToken()

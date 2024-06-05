@@ -1,18 +1,45 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Box, Button, Container, CssBaseline, Grid, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Container,
+  CssBaseline,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  TextField,
+  Typography,
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import FormValidationMessages from '../pages-types/validateTypes';
 import { Routes } from '../pages-types/pageTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
-import { getUser, updateUser } from '../../service/ProfileService';
+import { deleteAddress, getUser, updateUser } from '../../service/ProfileService';
 import PasswordModal from './PasswordModal';
+import './profile.css';
 
 interface Props {
   exitEditMode: () => void;
   data: UserData | null;
   updateData: (data: UserData) => void;
+}
+
+interface AddressType {
+  id: string;
+  streetName: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  default?: string;
 }
 
 interface UserData {
@@ -66,6 +93,11 @@ interface PersonalActionType {
   dateOfBirth?: string;
 }
 
+interface DeleteAddressAction {
+  action: 'removeShippingAddressId' | 'removeBillingAddressId';
+  addressId: string;
+}
+
 function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   const navigate = useNavigate();
 
@@ -89,18 +121,17 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   const [personalSnackbarNeeded, setPersonalSnackbarNeeded] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [wrongPersonalSnackbarNeeded, setWrongPersonalSnackbarNeeded] = useState(false);
+  const [deleteAddressSnackbarNeeded, setDeleteAddressSnackbarNeeded] = useState(false);
   const snackbarClose = () => {
     setPersonalSnackbarNeeded(false);
   };
 
   const passwordModalHandler = () => {
     setPasswordModalOpen(true);
-    console.log(passwordModalOpen);
   };
 
   const setPasswordModalFalse = () => {
     setPasswordModalOpen(false);
-    console.log(passwordModalOpen);
   };
 
   const firstName = watch('firstName');
@@ -109,43 +140,6 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   const email = watch('email');
 
   const onPersonalSubmit = async (): Promise<void> => {
-    console.log(data);
-    // const shippingAddress: Address = {
-    //   streetName: data.shippingStreet,
-    //   city: data.shippingCity,
-    //   country: data.shippingCountry,
-    //   postalCode: data.shippingPostal,
-    // };
-    // const formData: SignupData = {
-    //   email: data.email,
-    //   firstName: data.firstName,
-    //   lastName: data.lastName,
-    //   password: data.password,
-    //   dateOfBirth: data.birthDate,
-    //   addresses: [shippingAddress],
-    // };
-
-    // if (!data.defaultBillingAddress) {
-    //   const billingAddress: Address = {
-    //     streetName: data.billingStreet,
-    //     city: data.billingCity,
-    //     country: data.billingCountry,
-    //     postalCode: data.billingPostal,
-    //   };
-    //   formData.addresses.push(billingAddress);
-    // }
-
-    // if (data.defaultShippingAddress) {
-    //   formData.defaultShippingAddress = 0;
-    // }
-    // if (data.defaultBillingAddress) {
-    //   formData.defaultBillingAddress = 0;
-    // }
-
-    // if (!data.defaultBillingAddress && data.defaultBillingAddress2) {
-    //   formData.defaultBillingAddress = 1;
-    // }
-
     const actions: PersonalActionType[] = [];
 
     if (firstName) {
@@ -188,9 +182,91 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
         setWrongPersonalSnackbarNeeded(true);
       }
     } catch (err) {
-      setPersonalSnackbarNeeded(false);
+      setWrongPersonalSnackbarNeeded(true);
     }
   };
+
+  const [selectedItem, setSelectedItem] = useState('');
+  const [selectedBillingItem, setSelectedBillingItem] = useState('');
+
+  const shippingEditHandler = (value: AddressType) => () => {
+    if (value.id === selectedItem) {
+      setPersonalSnackbarNeeded(true); // delete
+    }
+  };
+
+  const shippingDeleteHandler = (value: AddressType) => async () => {
+    const actions: DeleteAddressAction[] = [];
+    if (value.id === selectedItem) {
+      const action: DeleteAddressAction = {
+        action: 'removeShippingAddressId',
+        addressId: value.id,
+      };
+      actions.push(action);
+      try {
+        await deleteAddress(actions);
+        setDeleteAddressSnackbarNeeded(true);
+      } catch (err) {
+        setWrongPersonalSnackbarNeeded(true);
+      }
+    }
+  };
+
+  const billingEditHandler = (value: AddressType) => () => {
+    if (`${value.id}-billing` === selectedBillingItem) {
+      setPersonalSnackbarNeeded(true); // delete
+    }
+  };
+
+  const billingDeleteHandler = (value: AddressType) => async () => {
+    const actions: DeleteAddressAction[] = [];
+    if (`${value.id}-billing` === selectedBillingItem) {
+      const action: DeleteAddressAction = {
+        action: 'removeBillingAddressId',
+        addressId: value.id,
+      };
+      actions.push(action);
+      try {
+        await deleteAddress(actions);
+        setDeleteAddressSnackbarNeeded(true);
+      } catch (err) {
+        setWrongPersonalSnackbarNeeded(true);
+      }
+    }
+  };
+
+  const handleToggle = (value: string) => () => {
+    setSelectedItem(value === selectedItem ? '' : value);
+  };
+
+  const handleBillingToggle = (value: string) => () => {
+    setSelectedBillingItem(value === selectedBillingItem ? '' : value);
+  };
+
+  const shippingAddresses: AddressType[] = [];
+  data?.shippingAddressIds.forEach((id) => {
+    data.addresses.forEach((address) => {
+      if (id === address.id) {
+        if (data.defaultShippingAddressId === id) {
+          // eslint-disable-next-line no-param-reassign
+          address.default = 'default';
+        }
+        shippingAddresses.push(address);
+      }
+    });
+  });
+  const billingAddresses: AddressType[] = [];
+  data?.billingAddressIds.forEach((id) => {
+    data.addresses.forEach((address) => {
+      if (id === address.id) {
+        if (data.defaultBillingAddressId === id) {
+          // eslint-disable-next-line no-param-reassign
+          address.default = 'default';
+        }
+        billingAddresses.push(address);
+      }
+    });
+  });
 
   return (
     <Container component='main' maxWidth='xs'>
@@ -318,6 +394,98 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
             Change password
           </Button>
         </form>
+        <Grid
+          style={{ border: '1px solid black', borderRadius: '5px', padding: '10px' }}
+          item
+          xs={12}
+        >
+          <Grid item xs={12}>
+            <Typography style={{ fontWeight: 600, fontSize: '18px' }}>
+              Shipping addresses
+            </Typography>
+            <List style={{ width: '100%', minWidth: '410px' }}>
+              {shippingAddresses.map((value) => {
+                const labelId = `checkbox-list-label-${value.id}`;
+
+                return (
+                  <ListItem key={value.id} role={undefined} dense onClick={handleToggle(value.id)}>
+                    <ListItemIcon>
+                      <Checkbox
+                        edge='start'
+                        checked={value.id === selectedItem}
+                        tabIndex={-1}
+                        disableRipple
+                        inputProps={{ 'aria-labelledby': labelId }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      id={labelId}
+                      primary={
+                        <Typography>
+                          {`${value.country}, ${value.city}, ${value.streetName}, ${value.postalCode} `}
+                          <span style={{ color: 'blue' }}>{value.default}</span>
+                        </Typography>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <IconButton onClick={shippingEditHandler(value)} edge='end' aria-label=''>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton onClick={shippingDeleteHandler(value)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography style={{ fontWeight: 600, fontSize: '18px' }}>Billing addresses</Typography>
+            <List style={{ width: '100%', minWidth: '410px' }}>
+              {billingAddresses.map((value) => {
+                const labelId = `checkbox-list-label-billing-${value.id}`;
+
+                return (
+                  <ListItem
+                    key={`${value.id}-billing`}
+                    role={undefined}
+                    dense
+                    onClick={handleBillingToggle(`${value.id}-billing`)}
+                  >
+                    <ListItemIcon>
+                      <Checkbox
+                        edge='start'
+                        checked={`${value.id}-billing` === selectedBillingItem}
+                        tabIndex={-1}
+                        disableRipple
+                        inputProps={{ 'aria-labelledby': labelId }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      id={labelId}
+                      primary={
+                        <Typography>
+                          {`${value.country}, ${value.city}, ${value.streetName}, ${value.postalCode} `}
+                          <span style={{ color: 'blue' }}>{value.default}</span>
+                        </Typography>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <IconButton onClick={billingEditHandler(value)} edge='end' aria-label=''>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton onClick={billingDeleteHandler(value)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Grid>
+        </Grid>
+
         {passwordModalOpen && <PasswordModal setPasswordModalFalse={setPasswordModalFalse} />}
         {personalSnackbarNeeded && (
           <SimpleSnackbar
@@ -332,6 +500,9 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
             text='You entered no valid data!'
             closeModal={snackbarClose}
           />
+        )}
+        {deleteAddressSnackbarNeeded && (
+          <SimpleSnackbar colorName='success' text='Address deleted!' closeModal={snackbarClose} />
         )}
       </Box>
     </Container>
