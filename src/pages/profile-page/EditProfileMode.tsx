@@ -2,7 +2,7 @@
 import { Box, Button, Container, CssBaseline, Grid, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import FormValidationMessages from '../pages-types/validateTypes';
 import { RoutesPages } from '../pages-types/pageTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
@@ -67,7 +67,7 @@ interface PersonalActionType {
 }
 
 function EditProfileMode({ exitEditMode, /* data */ updateData }: Props) {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   const backBtnHandler = async () => {
     const userData = await getUser();

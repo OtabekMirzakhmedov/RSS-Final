@@ -14,7 +14,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import FormValidationMessages from '../pages-types/validateTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { updatePassword } from '../../service/ProfileService';
@@ -37,7 +37,7 @@ interface Props {
 }
 
 export default function PasswordModal({ setPasswordModalFalse }: Props) {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const {
     register,
     formState: { errors },

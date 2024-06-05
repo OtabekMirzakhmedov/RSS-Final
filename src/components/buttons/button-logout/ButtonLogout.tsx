@@ -1,10 +1,10 @@
 import Button from '@mui/material/Button';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../service/AuthenticationService';
 import { RoutesPages } from '../../../pages/pages-types/pageTypes';
 
 export default function ButtonLogout() {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   const handleLogoutClick = () => {
     localStorage.clear();

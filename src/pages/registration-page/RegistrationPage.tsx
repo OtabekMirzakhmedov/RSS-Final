@@ -29,7 +29,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { createAccount, login } from '../../service/AuthenticationService';
 import Header from '../../components/header/Header';
 import { RoutesPages } from '../pages-types/pageTypes';
@@ -88,7 +88,7 @@ function RegistrationPage() {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   const isLoggedin = localStorage.getItem('token') !== null;
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   useEffect(() => {
     if (isLoggedin) {

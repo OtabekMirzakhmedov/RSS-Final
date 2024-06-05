@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button, TextField, Container, Backdrop, CircularProgress } from '@mui/material';
@@ -18,7 +18,7 @@ interface Inputs {
 }
 
 export default function LoginPage() {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const isLoggedin = localStorage.getItem('token') !== null;
 
   useEffect(() => {
