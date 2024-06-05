@@ -95,7 +95,6 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
   const billingAddresses: AddressType[] = [];
   const navigate: NavigateFunction = useNavigate();
 
-
   function updateAddresses(changedData: UserData) {
     changedData?.shippingAddressIds.forEach((id) => {
       changedData.addresses.forEach((address) => {
