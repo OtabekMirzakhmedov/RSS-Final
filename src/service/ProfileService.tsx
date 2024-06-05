@@ -50,13 +50,19 @@ const host = 'https://api.eu-central-1.aws.commercetools.com';
 export const getUser = async () => {
   let result = null;
   const id = localStorage.getItem('id');
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error('Authorization token is missing');
+  }
+
   try {
     const response: AxiosResponse<UserResponse> = await axios.get<UserResponse>(
       `${host}/${projectKey}/customers/${id}`,
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem(token)}`,
         },
       }
     );

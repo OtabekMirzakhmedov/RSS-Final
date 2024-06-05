@@ -11,6 +11,7 @@ interface Props {
 }
 
 export default function SimpleSnackbar({ text, closeModal, colorName }: Props) {
+  const DURATION_HIDE = 5000;
   const [open, setOpen] = useState(true);
 
   const handleClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
@@ -37,7 +38,7 @@ export default function SimpleSnackbar({ text, closeModal, colorName }: Props) {
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={DURATION_HIDE}
         onClose={handleClose}
         action={action}
       />

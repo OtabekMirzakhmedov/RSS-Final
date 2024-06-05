@@ -2,9 +2,9 @@
 import { Box, Button, Container, CssBaseline, Grid, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import FormValidationMessages from '../pages-types/validateTypes';
-import { Routes } from '../pages-types/pageTypes';
+import { RoutesPages } from '../pages-types/pageTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { getUser, updateUser } from '../../service/ProfileService';
 import PasswordModal from './PasswordModal';
@@ -66,8 +66,8 @@ interface PersonalActionType {
   dateOfBirth?: string;
 }
 
-function EditProfileMode({ exitEditMode, data, updateData }: Props) {
-  const navigate = useNavigate();
+function EditProfileMode({ exitEditMode, /* data */ updateData }: Props) {
+  const navigate: NavigateFunction = useNavigate();
 
   const backBtnHandler = async () => {
     const userData = await getUser();
@@ -75,7 +75,7 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
       updateData(userData);
     }
     exitEditMode();
-    navigate(Routes.PROFILE);
+    navigate(RoutesPages.PROFILE);
   };
 
   const {
@@ -95,12 +95,10 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
 
   const passwordModalHandler = () => {
     setPasswordModalOpen(true);
-    console.log(passwordModalOpen);
   };
 
   const setPasswordModalFalse = () => {
     setPasswordModalOpen(false);
-    console.log(passwordModalOpen);
   };
 
   const firstName = watch('firstName');
@@ -109,7 +107,7 @@ function EditProfileMode({ exitEditMode, data, updateData }: Props) {
   const email = watch('email');
 
   const onPersonalSubmit = async (): Promise<void> => {
-    console.log(data);
+    // console.log(data);
     // const shippingAddress: Address = {
     //   streetName: data.shippingStreet,
     //   city: data.shippingCity,

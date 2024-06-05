@@ -14,11 +14,11 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import FormValidationMessages from '../pages-types/validateTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { updatePassword } from '../../service/ProfileService';
-import { Routes } from '../pages-types/pageTypes';
+import { RoutesPages } from '../pages-types/pageTypes';
 import { getAccessToken } from '../../service/AuthenticationService';
 
 interface PasswordForm {
@@ -37,7 +37,7 @@ interface Props {
 }
 
 export default function PasswordModal({ setPasswordModalFalse }: Props) {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const {
     register,
     formState: { errors },
@@ -79,7 +79,7 @@ export default function PasswordModal({ setPasswordModalFalse }: Props) {
         localStorage.clear();
         getAccessToken()
           .then(() => {
-            navigate(Routes.LOGIN);
+            navigate(RoutesPages.LOGIN);
           })
           .catch((error) => {
             throw new Error(`Error logging out: ${error}`);
