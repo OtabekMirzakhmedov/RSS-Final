@@ -9,14 +9,16 @@ import List from '@mui/material/List';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import ButtonLogin from '../buttons/button-login/ButtonLogin';
 import ButtonRegister from '../buttons/button-register/ButtonRegister';
 import ButtonLogout from '../buttons/button-logout/ButtonLogout';
+import ButtonCatalog from '../buttons/button-catalog/ButtonCatalog';
 import './header.scss';
+import ButtonProfile from '../buttons/button-profile/ButtonProfile';
 
 function Header() {
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
   const isLoggedin = localStorage.getItem('token') !== null;
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
@@ -32,9 +34,14 @@ function Header() {
         </Typography>
         <Box className='button-box' sx={{ display: { xs: 'none', sm: 'flex' } }}>
           {isLoggedin ? (
-            <ButtonLogout />
+            <>
+              <ButtonProfile />
+              <ButtonCatalog />
+              <ButtonLogout />
+            </>
           ) : (
             <>
+              <ButtonCatalog />
               <ButtonLogin />
               <ButtonRegister />
             </>
@@ -62,11 +69,19 @@ function Header() {
         </IconButton>
         <List>
           {isLoggedin ? (
-            <ListItem>
-              <ButtonLogout />
-            </ListItem>
+            <>
+              <ListItem>
+                <ButtonCatalog />
+              </ListItem>
+              <ListItem>
+                <ButtonLogout />
+              </ListItem>
+            </>
           ) : (
             <>
+              <ListItem>
+                <ButtonCatalog />
+              </ListItem>
               <ListItem>
                 <ButtonLogin />
               </ListItem>

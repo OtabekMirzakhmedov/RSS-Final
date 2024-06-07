@@ -7,9 +7,11 @@ import { useState } from 'react';
 interface Props {
   text: string;
   closeModal: () => void;
+  colorName: 'success' | 'error' | 'warning';
 }
 
-export default function SimpleSnackbar({ text, closeModal }: Props) {
+export default function SimpleSnackbar({ text, closeModal, colorName }: Props) {
+  const DURATION_HIDE = 5000;
   const [open, setOpen] = useState(true);
 
   const handleClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
@@ -22,7 +24,7 @@ export default function SimpleSnackbar({ text, closeModal }: Props) {
 
   const action = (
     <>
-      <Button color='warning' size='medium' onClick={handleClose}>
+      <Button color={colorName} size='medium' onClick={handleClose}>
         {text}
       </Button>
       <IconButton size='medium' aria-label='close' color='inherit' onClick={handleClose}>
@@ -36,9 +38,8 @@ export default function SimpleSnackbar({ text, closeModal }: Props) {
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={open}
-        autoHideDuration={5000}
+        autoHideDuration={DURATION_HIDE}
         onClose={handleClose}
-        message='Error!'
         action={action}
       />
     </div>

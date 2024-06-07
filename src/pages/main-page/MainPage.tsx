@@ -1,61 +1,40 @@
-import { useEffect, useState } from 'react';
+import { Typography, Box } from '@mui/material';
 import Header from '../../components/header/Header';
-import { GetProducts } from '../../service/ProductService';
-
-interface MainPageProduct {
-  id: string;
-  title: string;
-  author?: string;
-  image?: string;
-  price: number;
-}
+import './mainPage.scss';
 
 function MainPage() {
-  const [products, setProducts] = useState<MainPageProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const fetchedProducts = await GetProducts();
-        if (fetchedProducts) {
-          setProducts(fetchedProducts);
-        } else {
-          setError(new Error('Failed to fetch products'));
-        }
-      } catch (fetchError) {
-        setError(fetchError as Error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchProducts();
-  }, []);
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
   return (
     <>
       <Header />
-      <h1>MainPage</h1>
-      <ul>
-        {products.map((product) => (
-          <li key={product.id}>
-            <h2>{product.title}</h2>
-            <p>Author: {product.author}</p>
-            <p>Price: ${product.price.toFixed(2)}</p>
-            {product.image && <img src={product.image} alt={product.title} />}
-          </li>
-        ))}
-      </ul>
+      <Box
+        display='flex'
+        flexDirection='column'
+        justifyContent='center'
+        alignItems='center'
+        minHeight='100vh'
+        textAlign='center'
+        px={5}
+      >
+        <Typography variant='h1' gutterBottom>
+          Welcome to Book Haven
+        </Typography>
+        <Typography variant='h4' gutterBottom>
+          Your one-stop online shop for all your reading needs
+        </Typography>
+        <Typography variant='h5' gutterBottom>
+          Browse our extensive catalog, find your next favorite book, and enjoy seamless shopping
+          from the comfort of your home.
+        </Typography>
+        <Typography variant='h5' gutterBottom>
+          Discover new releases, bestsellers, and timeless classics.
+        </Typography>
+        <Typography variant='h5' gutterBottom>
+          Whether you are into fiction, non-fiction, or biographies, we have something for everyone.
+        </Typography>
+        <Typography variant='h6' gutterBottom>
+          Start exploring now and immerse yourself in the world of books!
+        </Typography>
+      </Box>
     </>
   );
 }

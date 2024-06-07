@@ -29,10 +29,10 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { createAccount, login } from '../../service/AuthenticationService';
 import Header from '../../components/header/Header';
-import { Routes } from '../pages-types/pageTypes';
+import { RoutesPages } from '../pages-types/pageTypes';
 import FormValidationMessages from '../pages-types/validateTypes';
 
 interface RegisterField {
@@ -42,24 +42,40 @@ interface RegisterField {
   email: string;
   password: string;
   repeatPassword: string;
-  street: string;
-  city: string;
-  country: string;
-  postal: string;
+  shippingStreet: string;
+  shippingCity: string;
+  shippingCountry: string;
+  shippingPostal: string;
+  billingStreet: string;
+  billingCity: string;
+  billingCountry: string;
+  billingPostal: string;
   defaultShippingAddress: boolean;
   defaultBillingAddress: boolean;
-}
-
-interface FormData {
-  email: string;
-  firstName: string;
-  lastName: string;
-  password: string;
+  defaultBillingAddress2: boolean;
 }
 
 interface Response {
   success: boolean;
   message: string;
+}
+
+interface Address {
+  streetName: string;
+  city: string;
+  country: string;
+  postalCode: string;
+}
+
+interface SignupData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  dateOfBirth: string;
+  addresses: Address[];
+  defaultShippingAddress?: number;
+  defaultBillingAddress?: number;
 }
 
 function RegistrationPage() {
@@ -72,11 +88,11 @@ function RegistrationPage() {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   const isLoggedin = localStorage.getItem('token') !== null;
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
   useEffect(() => {
     if (isLoggedin) {
-      navigate(Routes.HOME);
+      navigate(RoutesPages.HOME);
     }
   }, [isLoggedin, navigate]);
 
@@ -109,18 +125,49 @@ function RegistrationPage() {
   } = useForm<RegisterField>({
     mode: 'onChange',
     defaultValues: {
-      country: 'US',
+      shippingCountry: 'US',
+      billingCountry: 'US',
     },
   });
 
-  const onSubmit = async (data: FormData): Promise<void> => {
+  const onSubmit = async (data: RegisterField): Promise<void> => {
     setLoading(true);
-    const formData: FormData = {
+    const shippingAddress: Address = {
+      streetName: data.shippingStreet,
+      city: data.shippingCity,
+      country: data.shippingCountry,
+      postalCode: data.shippingPostal,
+    };
+    const formData: SignupData = {
       email: data.email,
       firstName: data.firstName,
       lastName: data.lastName,
       password: data.password,
+      dateOfBirth: data.birthDate,
+      addresses: [shippingAddress],
     };
+
+    if (!data.defaultBillingAddress) {
+      const billingAddress: Address = {
+        streetName: data.billingStreet,
+        city: data.billingCity,
+        country: data.billingCountry,
+        postalCode: data.billingPostal,
+      };
+      formData.addresses.push(billingAddress);
+    }
+
+    if (data.defaultShippingAddress) {
+      formData.defaultShippingAddress = 0;
+    }
+    if (data.defaultBillingAddress) {
+      formData.defaultBillingAddress = 0;
+    }
+
+    if (!data.defaultBillingAddress && data.defaultBillingAddress2) {
+      formData.defaultBillingAddress = 1;
+    }
+
     try {
       const response: Response = await createAccount(formData);
       setLoading(false);
@@ -134,7 +181,7 @@ function RegistrationPage() {
         setSnackbarMessage('Account created successfully!');
         setSnackbarOpen(true);
         await login(data.email, data.password);
-        navigate(Routes.HOME);
+        navigate(RoutesPages.HOME);
       }
     } catch (err) {
       setLoading(false);
@@ -149,14 +196,16 @@ function RegistrationPage() {
   };
 
   const handleLoginClick = (): void => {
-    navigate(Routes.LOGIN);
+    navigate(RoutesPages.LOGIN);
+  };
+
+  const handleDefaultBillingAddressChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    setShowBillingAddress(event.target.checked);
   };
 
   const password = watch('password');
-  const country = watch('country');
-  const handleBillingAddressCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setShowBillingAddress(event.target.checked);
-  };
+  const shippingCountry = watch('shippingCountry');
+  const billingCountry = watch('billingCountry');
 
   return (
     <div>
@@ -245,7 +294,6 @@ function RegistrationPage() {
                         now.getDate()
                       );
 
-                      // Проверка, что пользователю 13 лет и более
                       if (dob > thirteenYearsAgo) {
                         return FormValidationMessages.Birthday.InvalidFormat;
                       }
@@ -332,16 +380,16 @@ function RegistrationPage() {
                           fullWidth
                           label='Street'
                           type='text'
-                          id='street'
-                          {...register('street', {
+                          id='shippingStreet'
+                          {...register('shippingStreet', {
                             required: FormValidationMessages.Street.Required,
                             minLength: {
                               value: 1,
                               message: FormValidationMessages.Street.MinLength,
                             },
                           })}
-                          error={!!errors.street}
-                          helperText={errors.street ? errors.street.message : ''}
+                          error={!!errors.shippingStreet}
+                          helperText={errors.shippingStreet ? errors.shippingStreet.message : ''}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -349,8 +397,8 @@ function RegistrationPage() {
                           fullWidth
                           label='City'
                           type='text'
-                          id='city'
-                          {...register('city', {
+                          id='shippingCity'
+                          {...register('shippingCity', {
                             required: FormValidationMessages.City.Required,
                             minLength: {
                               value: 1,
@@ -361,8 +409,8 @@ function RegistrationPage() {
                               message: FormValidationMessages.City.InvalidFormat,
                             },
                           })}
-                          error={!!errors.city}
-                          helperText={errors.city ? errors.city.message : ''}
+                          error={!!errors.shippingCity}
+                          helperText={errors.shippingCity ? errors.shippingCity.message : ''}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -370,9 +418,9 @@ function RegistrationPage() {
                           <InputLabel id='country-label'>Country</InputLabel>
                           <Select
                             labelId='country-label'
-                            id='country'
+                            id='shippingCountry'
                             label='Country'
-                            {...register('country', {
+                            {...register('shippingCountry', {
                               required: FormValidationMessages.Country.Required,
                             })}
                             defaultValue='US'
@@ -387,12 +435,12 @@ function RegistrationPage() {
                           fullWidth
                           label='Postal Code'
                           variant='outlined'
-                          {...register('postal', {
+                          {...register('shippingPostal', {
                             required: FormValidationMessages.postalCode.Required,
-                            ...postalCodeValidation(country),
+                            ...postalCodeValidation(shippingCountry),
                           })}
-                          error={!!errors.postal}
-                          helperText={errors.postal ? errors.postal.message : ''}
+                          error={!!errors.shippingPostal}
+                          helperText={errors.shippingPostal ? errors.shippingPostal.message : ''}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -412,7 +460,7 @@ function RegistrationPage() {
                             <Checkbox
                               {...register('defaultBillingAddress')}
                               defaultChecked={false}
-                              onChange={handleBillingAddressCheckboxChange}
+                              onChange={handleDefaultBillingAddressChange}
                             />
                           }
                           label='Default Billing Address'
@@ -423,94 +471,86 @@ function RegistrationPage() {
                 </Card>
               </Grid>
               {!showBillingAddress && (
-                <Grid item xs={12}>
-                  <Card>
-                    <CardHeader title='Billing Address' />
-                    <CardContent>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            label='Street'
-                            type='text'
-                            id='street'
-                            {...register('street', {
-                              required: FormValidationMessages.Street.Required,
-                              minLength: {
-                                value: 1,
-                                message: FormValidationMessages.Street.MinLength,
-                              },
-                            })}
-                            error={!!errors.street}
-                            helperText={errors.street ? errors.street.message : ''}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            label='City'
-                            type='text'
-                            id='city'
-                            {...register('city', {
-                              required: FormValidationMessages.City.Required,
-                              minLength: {
-                                value: 1,
-                                message: FormValidationMessages.City.MinLength,
-                              },
-                              pattern: {
-                                value: /^[a-zA-Z]+$/,
-                                message: FormValidationMessages.City.InvalidFormat,
-                              },
-                            })}
-                            error={!!errors.city}
-                            helperText={errors.city ? errors.city.message : ''}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <FormControl fullWidth>
-                            <InputLabel id='country-label'>Country</InputLabel>
-                            <Select
-                              labelId='country-label'
-                              id='country'
-                              label='Country'
-                              {...register('country', {
-                                required: FormValidationMessages.Country.Required,
-                              })}
-                              defaultValue='US'
-                            >
-                              <MenuItem value='US'>United States</MenuItem>
-                              <MenuItem value='CA'>Canada</MenuItem>
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            label='Postal Code'
-                            variant='outlined'
-                            {...register('postal', {
-                              required: FormValidationMessages.postalCode.Required,
-                              ...postalCodeValidation(country),
-                            })}
-                            error={!!errors.postal}
-                            helperText={errors.postal ? errors.postal.message : ''}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                {...register('defaultBillingAddress')}
-                                defaultChecked={false}
-                              />
-                            }
-                            label='Default Billing Address'
-                          />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      id='billingStreet'
+                      label='Billing Street Address'
+                      autoComplete='billing street-address'
+                      {...register('billingStreet', {
+                        required: FormValidationMessages.Street.Required,
+                        minLength: {
+                          value: 1,
+                          message: FormValidationMessages.Street.MinLength,
+                        },
+                      })}
+                      error={!!errors.billingStreet}
+                      helperText={errors.billingStreet ? errors.billingStreet.message : ''}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      id='billingCity'
+                      label='Billing City'
+                      autoComplete='billing address-level2'
+                      type='text'
+                      {...register('billingCity', {
+                        required: FormValidationMessages.City.Required,
+                        minLength: {
+                          value: 1,
+                          message: FormValidationMessages.City.MinLength,
+                        },
+                        pattern: {
+                          value: /^[a-zA-Z]+$/,
+                          message: FormValidationMessages.City.InvalidFormat,
+                        },
+                      })}
+                      error={!!errors.billingCity}
+                      helperText={errors.billingCity ? errors.billingCity.message : ''}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControl fullWidth>
+                      <InputLabel id='billingCountry-label'>Billing Country</InputLabel>
+                      <Select
+                        labelId='billingCountry-label'
+                        id='billingCountry'
+                        label='Billing Country'
+                        {...register('billingCountry', {
+                          required: FormValidationMessages.Country.Required,
+                        })}
+                        defaultValue='US'
+                      >
+                        <MenuItem value='US'>United States</MenuItem>
+                        <MenuItem value='CA'>Canada</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      id='billingPostal'
+                      label='Billing Postal Code'
+                      autoComplete='billing postal-code'
+                      {...register('billingPostal', {
+                        required: FormValidationMessages.postalCode.Required,
+                        ...postalCodeValidation(billingCountry),
+                      })}
+                      error={!!errors.billingPostal}
+                      helperText={errors.billingPostal ? errors.billingPostal.message : ''}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox {...register('defaultBillingAddress2')} defaultChecked={false} />
+                      }
+                      label='Default Billing Address'
+                    />
+                  </Grid>
+                </>
               )}
             </Grid>
             {error && <Typography color='error'>{error}</Typography>}

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable import/prefer-default-export */
 /* eslint-disable no-console */
 import axios from 'axios';
 
@@ -30,6 +28,11 @@ interface RawProduct {
       };
     }[];
     prices: {
+      discounted?: {
+        value: {
+          centAmount: number;
+        };
+      };
       id: string;
       key: string;
       value: {
@@ -39,12 +42,26 @@ interface RawProduct {
   };
 }
 
-interface MainPageProduct {
+export interface MainPageProduct {
   id: string;
   title: string;
   author?: string;
   image?: string;
   price: number;
+  discount?: number;
+}
+
+export interface ProductDetails {
+  id: string;
+  title: string;
+  author?: string;
+  images?: string[];
+  price: number;
+  discount?: number;
+  description: string;
+  isbn: string;
+  publisherName: string;
+  pages: number;
 }
 
 interface ProductResponse {
@@ -61,24 +78,129 @@ const ConvertToMainPageProductData = (products: RawProduct[]): MainPageProduct[]
     author: product.masterVariant.attributes[0]?.value,
     image: product.masterVariant.images[0]?.url,
     price: (product.masterVariant.prices[0]?.value.centAmount ?? 0) / 100,
+    discount: (product.masterVariant.prices[0]?.discounted?.value.centAmount ?? 0) / 100,
   }));
 };
 
-export async function GetProducts(): Promise<MainPageProduct[] | null> {
+const ConvertToProductDetailData = (product: RawProduct): ProductDetails => {
+  const author = product.masterVariant.attributes.find(
+    (attr) => attr.name === 'author-name'
+  )?.value;
+  const isbn = product.masterVariant.attributes.find((attr) => attr.name === 'isbn-number')?.value;
+  const publisherName = product.masterVariant.attributes.find(
+    (attr) => attr.name === 'publisher-name'
+  )?.value;
+  const numberOfPages = product.masterVariant.attributes.find(
+    (attr) => attr.name === 'number-of-pages'
+  )?.value;
+
+  return {
+    id: product.id,
+    title: product.name['en-US'],
+    author: author ?? '',
+    images: product.masterVariant.images.map((image) => image.url),
+    price: (product.masterVariant.prices[0]?.value.centAmount ?? 0) / 100,
+    discount: (product.masterVariant.prices[0]?.discounted?.value.centAmount ?? 0) / 100,
+    description: product.description['en-US'],
+    isbn: isbn ?? '',
+    publisherName: publisherName ?? '',
+    pages: parseInt(numberOfPages!, 10),
+  };
+};
+
+export async function GetProducts(
+  sortOption?: string,
+  searchQuery?: string
+): Promise<MainPageProduct[] | null> {
   const initialToken = localStorage.getItem('initial_token');
-  const tokenValue = `Bearer ${initialToken}`;
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
+  let url = `${host}/${projectKey}/product-projections`;
+
+  if (sortOption && searchQuery) {
+    url = `${url}/search?sort=${sortOption}&text.en-US=${searchQuery}`;
+  } else if (searchQuery) {
+    url = `${url}/search?text.en-US=${searchQuery}`;
+  } else if (sortOption) {
+    url = `${url}/search?sort=${sortOption}`;
+  }
 
   try {
-    const response = await axios.get<ProductResponse>(`${host}/${projectKey}/product-projections`, {
+    const response = await axios.get<ProductResponse>(url, {
       headers: {
         Authorization: tokenValue,
       },
     });
 
     const productData = response.data;
-    console.log(productData.results);
+    // console.log(productData.results);
     const cleanedProducts = ConvertToMainPageProductData(productData.results);
-    console.log(cleanedProducts);
+    // console.log(cleanedProducts);
+    return cleanedProducts;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return null;
+  }
+}
+
+export async function GetProductById(productId: string): Promise<ProductDetails | null> {
+  const initialToken = localStorage.getItem('initial_token');
+  const tokenValue = `Bearer ${initialToken}`;
+  const url = `${host}/${projectKey}/product-projections/${productId}`;
+
+  try {
+    const response = await axios.get<RawProduct>(url, {
+      headers: {
+        Authorization: tokenValue,
+      },
+    });
+
+    const productData = response.data;
+    console.log(productData);
+    const cleanedProduct = ConvertToProductDetailData(productData);
+    console.log(cleanedProduct);
+    return cleanedProduct;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
+}
+
+export async function GetCategoryProducts(
+  categoryId: string,
+  sortOption?: string,
+  searchQuery?: string
+): Promise<MainPageProduct[] | null> {
+  const initialToken = localStorage.getItem('initial_token');
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
+  let url = `${host}/${projectKey}/product-projections/search?filter=categories.id:"${categoryId}"`;
+
+  if (sortOption && searchQuery) {
+    url = `${url}&sort=${sortOption}&text.en-US=${searchQuery}`;
+  } else if (searchQuery) {
+    url = `${url}&text.en-US=${searchQuery}`;
+  } else if (sortOption) {
+    url = `${url}&sort=${sortOption}`;
+  }
+
+  try {
+    const response = await axios.get<ProductResponse>(url, {
+      headers: {
+        Authorization: tokenValue,
+      },
+    });
+
+    const productData = response.data;
+    // console.log(productData.results);
+    const cleanedProducts = ConvertToMainPageProductData(productData.results);
+    // console.log(cleanedProducts);
     return cleanedProducts;
   } catch (error) {
     console.error('Error fetching products:', error);
