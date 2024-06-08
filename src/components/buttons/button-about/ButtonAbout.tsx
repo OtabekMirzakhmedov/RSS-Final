@@ -1,26 +1,26 @@
 import Button from '@mui/material/Button';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import GroupsIcon from '@mui/icons-material/Groups';
 import { useNavigate, useLocation, NavigateFunction } from 'react-router-dom';
 import { RoutesPages } from '../../../pages/pages-types/pageTypes';
 
-export default function ButtonProfile() {
+export default function ButtonAbout() {
   const navigate: NavigateFunction = useNavigate();
 
   const location = useLocation();
 
-  const handleClick = () => {
-    navigate(RoutesPages.PROFILE);
+  const handleAboutClick = () => {
+    navigate(RoutesPages.ABOUT);
   };
 
   return (
     <Button
       variant='contained'
       color='success'
-      endIcon={<AccountCircleIcon />}
-      disabled={location.pathname === RoutesPages.PROFILE.toString()}
-      onClick={handleClick}
+      endIcon={<GroupsIcon />}
+      disabled={location.pathname === RoutesPages.ABOUT.toString()}
+      onClick={handleAboutClick}
     >
-      User
+      About us
     </Button>
   );
 }
