@@ -16,6 +16,7 @@ import ButtonLogout from '../buttons/button-logout/ButtonLogout';
 import ButtonCatalog from '../buttons/button-catalog/ButtonCatalog';
 import './header.scss';
 import ButtonProfile from '../buttons/button-profile/ButtonProfile';
+import ButtonAbout from '../buttons/button-about/ButtonAbout';
 
 function Header() {
   const navigate: NavigateFunction = useNavigate();
@@ -33,6 +34,7 @@ function Header() {
           HardBooks
         </Typography>
         <Box className='button-box' sx={{ display: { xs: 'none', sm: 'flex' } }}>
+          <ButtonAbout />
           {isLoggedin ? (
             <>
               <ButtonProfile />
@@ -68,6 +70,9 @@ function Header() {
           <ChevronRightIcon />
         </IconButton>
         <List>
+          <ListItem>
+            <ButtonAbout />
+          </ListItem>
           {isLoggedin ? (
             <>
               <ListItem>
