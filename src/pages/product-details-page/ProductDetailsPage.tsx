@@ -40,10 +40,13 @@ function ProductDetailsPage() {
       const check = await CheckProductExists(productId!);
       if (typeof check === 'string') {
         setLineItemId(check);
+        setIsInCart(true);
+      } else {
+        setIsInCart(false);
       }
-      setIsInCart(true);
     } catch (err) {
       console.error('Error checking product in cart:', err);
+      setIsInCart(false);
     }
   };
 
@@ -54,7 +57,6 @@ function ProductDetailsPage() {
       if (productDetails) {
         setProduct(productDetails);
         setMainImage(productDetails.images![0]!);
-        checkIfProductIsInCart();
       } else {
         setError('Failed to fetch product details');
       }
@@ -67,7 +69,9 @@ function ProductDetailsPage() {
   };
 
   useEffect(() => {
-    fetchProductDetails();
+    checkIfProductIsInCart().then(() => {
+      fetchProductDetails();
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
