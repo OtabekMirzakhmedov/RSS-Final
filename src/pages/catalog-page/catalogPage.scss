@@ -1,4 +1,7 @@
 .card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   height: 100%;
   cursor: pointer;
   transition: background-color 0.5s ease;
@@ -16,7 +19,6 @@
   }
 
   .card-content {
-    height: 100%;
     transition:
       background-color,
       0.5s ease,
@@ -28,6 +30,10 @@
     .card-content {
       color: white;
       background-color: rgb(166, 92, 240);
+    }
+
+    .product-title {
+      color: blue;
     }
 
     .box-img::before {
@@ -49,5 +55,11 @@
   .old-price {
     text-decoration: line-through;
     color: grey;
+  }
+
+  .card-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
   }
 }

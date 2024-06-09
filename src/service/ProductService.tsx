@@ -4,7 +4,7 @@ import axios from 'axios';
 const projectKey = 'rss-final-commerce';
 const host = 'https://api.eu-central-1.aws.commercetools.com';
 
-interface RawProduct {
+export interface RawProduct {
   id: string;
   name: {
     'en-US': string;
@@ -136,9 +136,7 @@ export async function GetProducts(
     });
 
     const productData = response.data;
-    // console.log(productData.results);
     const cleanedProducts = ConvertToMainPageProductData(productData.results);
-    // console.log(cleanedProducts);
     return cleanedProducts;
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -159,9 +157,7 @@ export async function GetProductById(productId: string): Promise<ProductDetails 
     });
 
     const productData = response.data;
-    console.log(productData);
     const cleanedProduct = ConvertToProductDetailData(productData);
-    console.log(cleanedProduct);
     return cleanedProduct;
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -198,9 +194,7 @@ export async function GetCategoryProducts(
     });
 
     const productData = response.data;
-    // console.log(productData.results);
     const cleanedProducts = ConvertToMainPageProductData(productData.results);
-    // console.log(cleanedProducts);
     return cleanedProducts;
   } catch (error) {
     console.error('Error fetching products:', error);
