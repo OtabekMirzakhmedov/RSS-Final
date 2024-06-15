@@ -58,12 +58,20 @@ interface AddressActionType {
     | 'removeShippingAddressId'
     | 'removeBillingAddressId'
     | 'addShippingAddressId'
-    | 'addBillingAddressId';
-  addressId: string;
+    | 'addBillingAddressId'
+    | 'setDefaultShippingAddress'
+    | 'setDefaultBillingAddress';
+  addressId: string | undefined;
 }
 
 interface AddAddressActionType {
   action: 'addAddress';
+  address: AddAddressType;
+}
+
+interface ChangeAddressAction {
+  action: 'changeAddress';
+  addressId: string | undefined;
   address: AddAddressType;
 }
 
@@ -241,7 +249,7 @@ export const addAddress = async (actions: AddAddressActionType[]) => {
   }
 };
 
-export const addShippingAddress = async (actions: AddressActionType[]) => {
+export const setDetailedAddress = async (actions: AddressActionType[]) => {
   let result = null;
   const id = localStorage.getItem('id');
   const versionString = localStorage?.getItem('version');
@@ -264,7 +272,7 @@ export const addShippingAddress = async (actions: AddressActionType[]) => {
   localStorage.setItem('version', result.toString());
 };
 
-export const addBillingAddress = async (actions: AddressActionType[]) => {
+export const changeAddress = async (actions: ChangeAddressAction[]) => {
   let result = null;
   const id = localStorage.getItem('id');
   const versionString = localStorage?.getItem('version');

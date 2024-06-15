@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import FormValidationMessages from '../pages-types/validateTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
-import { addAddress, setDetailedAddress } from '../../service/ProfileService';
+import { changeAddress, setDetailedAddress } from '../../service/ProfileService';
 
 interface AddressForm {
   street: string;
@@ -28,40 +28,47 @@ interface AddressForm {
   defaultAddress: boolean;
 }
 
-interface AddAddressType {
+interface AddressType {
+  id: string;
   streetName: string;
   postalCode: string;
   city: string;
   country: string;
+  default?: string;
 }
 
-interface AddAddressActionType {
-  action: 'addAddress';
-  address: AddAddressType;
-}
-
-interface AddressIdActionType {
-  action: 'addBillingAddressId' | 'addShippingAddressId';
-  addressId: string;
-}
 interface DefaultActionType {
   action: 'setDefaultShippingAddress' | 'setDefaultBillingAddress';
-  addressId: string;
+  addressId: string | undefined;
 }
 
-interface Response {
-  success: boolean;
-  message: string;
-  newAddressId?: string;
+interface ChangeAddressType {
+  id?: string;
+  streetName: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  default?: string;
+}
+interface ChangeAddressAction {
+  action: 'changeAddress';
+  addressId: string | undefined;
+  address: ChangeAddressType;
 }
 
 interface Props {
   setAddressModalFalse: () => void;
+  editValue: AddressType | null;
   getUserInfo: () => void;
   actionType: 'addBillingAddressId' | 'addShippingAddressId';
 }
 
-export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, actionType }: Props) {
+export default function EditAddressModal({
+  setAddressModalFalse,
+  getUserInfo,
+  editValue,
+  actionType,
+}: Props) {
   const postalCodeValidation = (country: string) => {
     if (country === 'US') {
       return {
@@ -88,6 +95,9 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
     mode: 'onChange',
     defaultValues: {
       country: 'US',
+      street: editValue?.streetName,
+      city: editValue?.city,
+      postal: editValue?.postalCode,
     },
   });
 
@@ -104,52 +114,62 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
     setAddressSnackbarNeeded(false);
   };
 
+  const country = watch('country');
+  const street = watch('street');
+  const city = watch('city');
+  const postal = watch('postal');
+
+  const editDefault = editValue?.default === 'default';
+
   const onSubmit = async (data: AddressForm): Promise<void> => {
-    const actions: AddAddressActionType[] = [];
-    const addressData: AddAddressType = {
-      streetName: data.street,
-      postalCode: data.postal,
-      city: data.city,
-      country: data.country,
-    };
-    const action: AddAddressActionType = {
-      action: 'addAddress',
-      address: addressData,
-    };
-    actions.push(action);
+    const actions: ChangeAddressAction[] = [];
+    if (country || street || city || (postal && editValue?.id)) {
+      const action: ChangeAddressAction = {
+        action: 'changeAddress',
+        addressId: editValue?.id,
+        address: {
+          streetName: street,
+          city,
+          country,
+          postalCode: postal,
+        },
+      };
+      actions.push(action);
+    }
 
     try {
-      const response: Response = await addAddress(actions);
-      if (response.success && response.newAddressId) {
-        const addressIdAction: AddressIdActionType = {
-          action: actionType,
-          addressId: response.newAddressId,
-        };
-
-        if (data.defaultAddress) {
+      if (actions.length > 0) {
+        await changeAddress(actions);
+        if (!data.defaultAddress || data.defaultAddress) {
           const defaultAction: DefaultActionType = {
             action:
               actionType === 'addShippingAddressId'
                 ? 'setDefaultShippingAddress'
                 : 'setDefaultBillingAddress',
-            addressId: response.newAddressId,
+            addressId: data.defaultAddress ? editValue?.id : undefined,
           };
-          await setDetailedAddress([addressIdAction, defaultAction]);
-        } else {
-          await setDetailedAddress([addressIdAction]);
+          await setDetailedAddress([defaultAction]);
         }
-
+        setAddressSnackbarNeeded(true);
+        getUserInfo();
+      } else if (!data.defaultAddress || data.defaultAddress) {
+        const defaultAction: DefaultActionType = {
+          action:
+            actionType === 'addShippingAddressId'
+              ? 'setDefaultShippingAddress'
+              : 'setDefaultBillingAddress',
+          addressId: data.defaultAddress ? editValue?.id : undefined,
+        };
+        await setDetailedAddress([defaultAction]);
         setAddressSnackbarNeeded(true);
         getUserInfo();
       } else {
         setWrongAddressSnackbarNeeded(true);
       }
     } catch (err) {
-      throw new Error(`error}`);
+      setWrongAddressSnackbarNeeded(true);
     }
   };
-
-  const country = watch('country');
 
   return (
     <Container component='main' maxWidth='xs'>
@@ -265,7 +285,9 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
               {actionType === 'addShippingAddressId' && (
                 <Grid item xs={12}>
                   <FormControlLabel
-                    control={<Checkbox {...register('defaultAddress')} defaultChecked={false} />}
+                    control={
+                      <Checkbox {...register('defaultAddress')} defaultChecked={editDefault} />
+                    }
                     label='Default Shipping Address'
                   />
                 </Grid>
@@ -273,7 +295,9 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
               {actionType === 'addBillingAddressId' && (
                 <Grid item xs={12}>
                   <FormControlLabel
-                    control={<Checkbox {...register('defaultAddress')} defaultChecked={false} />}
+                    control={
+                      <Checkbox {...register('defaultAddress')} defaultChecked={editDefault} />
+                    }
                     label='Default Billing Address'
                   />
                 </Grid>
@@ -303,7 +327,7 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
         {addressSnackbarNeeded && (
           <SimpleSnackbar
             colorName='success'
-            text='New address added successfully!'
+            text='Address is edited successfully!!'
             closeModal={snackbarClose}
           />
         )}

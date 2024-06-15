@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import {
@@ -26,8 +27,9 @@ import { RoutesPages } from '../pages-types/pageTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { deleteAddress, getUser, updateUser } from '../../service/ProfileService';
 import PasswordModal from './PasswordModal';
-import './profile.css';
+import './profile.scss';
 import AddressModal from './AddressModal';
+import EditAddressModal from './EditAddressModal';
 
 interface Props {
   exitEditMode: () => void;
@@ -100,7 +102,6 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
       changedData.addresses.forEach((address) => {
         if (id === address.id) {
           if (changedData.defaultShippingAddressId === id) {
-            // eslint-disable-next-line no-param-reassign
             address.default = 'default';
           }
           shippingAddresses.push(address);
@@ -112,7 +113,6 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
       changedData.addresses.forEach((address) => {
         if (id === address.id) {
           if (changedData.defaultBillingAddressId === id) {
-            // eslint-disable-next-line no-param-reassign
             address.default = 'default';
           }
           billingAddresses.push(address);
@@ -158,6 +158,7 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [addressShippingModalOpen, setAddressShippingModalOpen] = useState(false);
   const [addressBillingModalOpen, setAddressBillingModalOpen] = useState(false);
+  const [addressEditModalOpen, setAddressEditModalOpen] = useState(false);
   const [wrongPersonalSnackbarNeeded, setWrongPersonalSnackbarNeeded] = useState(false);
   const [deleteAddressSnackbarNeeded, setDeleteAddressSnackbarNeeded] = useState(false);
   const snackbarClose = () => {
@@ -178,6 +179,13 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
 
   const setShippingAddressModalFalse = () => {
     setAddressShippingModalOpen(false);
+  };
+  const addressEditModalHandler = () => {
+    setAddressEditModalOpen(true);
+  };
+
+  const setAddressEditModalFalse = () => {
+    setAddressEditModalOpen(false);
   };
 
   const addressBillingModalHandler = () => {
@@ -242,10 +250,16 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
 
   const [selectedItem, setSelectedItem] = useState('');
   const [selectedBillingItem, setSelectedBillingItem] = useState('');
+  const [editValue, setEditValue] = useState<AddressType | null>(null);
+  const [actionType, setActionType] = useState<'addBillingAddressId' | 'addShippingAddressId'>(
+    'addBillingAddressId'
+  );
 
   const shippingEditHandler = (value: AddressType) => () => {
     if (value.id === selectedItem) {
-      setPersonalSnackbarNeeded(true); // delete
+      setEditValue(value);
+      setActionType('addShippingAddressId');
+      addressEditModalHandler();
     }
   };
 
@@ -269,7 +283,9 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
 
   const billingEditHandler = (value: AddressType) => () => {
     if (`${value.id}-billing` === selectedBillingItem) {
-      setPersonalSnackbarNeeded(true); // delete
+      setEditValue(value);
+      setActionType('addBillingAddressId');
+      addressEditModalHandler();
     }
   };
 
@@ -578,6 +594,14 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
         )}
         {deleteAddressSnackbarNeeded && (
           <SimpleSnackbar colorName='success' text='Address deleted!' closeModal={snackbarClose} />
+        )}
+        {addressEditModalOpen && (
+          <EditAddressModal
+            setAddressModalFalse={setAddressEditModalFalse}
+            getUserInfo={getUserInfo}
+            editValue={editValue}
+            actionType={actionType}
+          />
         )}
       </Box>
     </Container>
