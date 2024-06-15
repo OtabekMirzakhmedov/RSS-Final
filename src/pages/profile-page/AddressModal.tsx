@@ -44,6 +44,7 @@ interface AddressIdActionType {
   action: 'addBillingAddressId' | 'addShippingAddressId';
   addressId: string;
 }
+
 interface DefaultActionType {
   action: 'setDefaultShippingAddress' | 'setDefaultBillingAddress';
   addressId: string;

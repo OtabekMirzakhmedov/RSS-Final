@@ -7,6 +7,7 @@ export enum RoutesPages {
   GATEGORY = '/catalog/:categoryName',
   PRODUCT = '/product/:productId',
   NOTFOUND = '*',
+  ABOUT = '/about',
 }
 
 export enum Categories {

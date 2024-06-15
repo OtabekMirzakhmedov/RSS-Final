@@ -160,7 +160,7 @@ export const createAccount = async (signUpData: SignupData): Promise<ApiResponse
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `${host}/${projectKey}/customers`,
+    url: `${host}/${projectKey}/me/signup`,
     headers: {
       'Content-Type': 'application/json',
       Authorization: tokenValue,

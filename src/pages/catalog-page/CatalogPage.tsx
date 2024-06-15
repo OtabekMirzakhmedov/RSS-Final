@@ -22,10 +22,15 @@ import {
   SelectChangeEvent,
   TextField,
   ListItem,
+  CardActions,
+  Backdrop,
+  Snackbar,
 } from '@mui/material';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import Header from '../../components/header/Header';
 
 import { GetProducts, MainPageProduct } from '../../service/ProductService';
+import { AddItemToCart } from '../../service/CartService'; // Assuming these are imported from CartService
 import './catalogPage.scss';
 
 function CatalogPage() {
@@ -36,6 +41,8 @@ function CatalogPage() {
   const [sortOption, setSortOption] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [triggerSearch, setTriggerSearch] = useState<number>(0); // New state for search trigger
+  const [addingToCart, setAddingToCart] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('')ж
   const navigate: NavigateFunction = useNavigate();
 
   const fetchProducts = async (sortOption: string, searchQuery: string) => {
@@ -78,6 +85,23 @@ function CatalogPage() {
 
   const handleCategoryClick = (category: string) => {
     navigate(`/catalog/${category}`);
+  };
+
+  const handleAddToCart = async (event: React.MouseEvent, productId: string) => {
+    event.stopPropagation();
+    setAddingToCart(true);
+    try {
+      await AddItemToCart(productId);
+      setSnackbarMessage('Item successfully added to cart!');
+    } catch (error) {
+      setSnackbarMessage('Failed to add item to cart.');
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbarMessage('');
   };
 
   if (loading) {
@@ -195,6 +219,16 @@ function CatalogPage() {
                         </Typography>
                       )}
                     </CardContent>
+                    <CardActions>
+                      <Button
+                        variant='outlined'
+                        startIcon={<AddShoppingCartIcon />}
+                        onClick={(event) => handleAddToCart(event, product.id)}
+                        disabled={addingToCart}
+                      >
+                        Add to cart
+                      </Button>
+                    </CardActions>
                   </Card>
                 </Grid>
               ))}
@@ -232,6 +266,16 @@ function CatalogPage() {
           </Box>
         </Drawer>
       </Container>
+      <Backdrop open={addingToCart} style={{ zIndex: 1300 }}>
+        <CircularProgress color='inherit' />
+      </Backdrop>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={!!snackbarMessage}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />
     </>
   );
 }

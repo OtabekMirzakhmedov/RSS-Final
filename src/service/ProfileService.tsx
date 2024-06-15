@@ -250,6 +250,7 @@ export const addAddress = async (actions: AddAddressActionType[]) => {
 };
 
 export const setDetailedAddress = async (actions: AddressActionType[]) => {
+
   let result = null;
   const id = localStorage.getItem('id');
   const versionString = localStorage?.getItem('version');
@@ -272,7 +273,9 @@ export const setDetailedAddress = async (actions: AddressActionType[]) => {
   localStorage.setItem('version', result.toString());
 };
 
+
 export const changeAddress = async (actions: ChangeAddressAction[]) => {
+
   let result = null;
   const id = localStorage.getItem('id');
   const versionString = localStorage?.getItem('version');
