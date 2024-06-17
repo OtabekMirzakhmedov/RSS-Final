@@ -76,6 +76,8 @@ interface SignupData {
   addresses: Address[];
   defaultShippingAddress?: number;
   defaultBillingAddress?: number;
+  shippingAddresses: number[];
+  billingAddresses: number[];
 }
 
 function RegistrationPage() {
@@ -145,6 +147,8 @@ function RegistrationPage() {
       password: data.password,
       dateOfBirth: data.birthDate,
       addresses: [shippingAddress],
+      shippingAddresses: [0],
+      billingAddresses: [],
     };
 
     if (!data.defaultBillingAddress) {
@@ -155,6 +159,7 @@ function RegistrationPage() {
         postalCode: data.billingPostal,
       };
       formData.addresses.push(billingAddress);
+      formData.billingAddresses.push(1);
     }
 
     if (data.defaultShippingAddress) {
@@ -318,7 +323,7 @@ function RegistrationPage() {
                       message: FormValidationMessages.Email.InvalidFormat,
                     },
                   })}
-                  type='email'
+                  type='text'
                   error={!!errors.email}
                   helperText={errors.email ? errors.email.message : ''}
                 />
