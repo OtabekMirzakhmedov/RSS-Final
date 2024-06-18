@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import axios from 'axios';
+import { getAccessToken } from './AuthenticationService';
 
 const projectKey = 'rss-final-commerce';
 const host = 'https://api.eu-central-1.aws.commercetools.com';
@@ -55,7 +56,7 @@ export interface ProductDetails {
   id: string;
   title: string;
   author?: string;
-  images?: string[];
+  images: string[];
   price: number;
   discount?: number;
   description: string;
@@ -145,6 +146,8 @@ export async function GetProducts(
 }
 
 export async function GetProductById(productId: string): Promise<ProductDetails | null> {
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  getAccessToken();
   const initialToken = localStorage.getItem('initial_token');
   const tokenValue = `Bearer ${initialToken}`;
   const url = `${host}/${projectKey}/product-projections/${productId}`;

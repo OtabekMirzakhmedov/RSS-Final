@@ -10,10 +10,14 @@ import CatalogPage from './pages/catalog-page/CatalogPage';
 import CategoryCatalogPage from './pages/category-catalog-page/CategoryCatalogPage';
 import { RoutesPages } from './pages/pages-types/pageTypes';
 import AboutPage from './pages/about-page/AboutPage';
+import BasketPage from './pages/basket-page/BasketPage';
 
 function App() {
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  getAccessToken();
+  if (!localStorage.getItem('initial_token')) {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    getAccessToken();
+  }
+
   return (
     <Router>
       <Routes>
@@ -26,6 +30,7 @@ function App() {
         <Route path={RoutesPages.NOTFOUND} element={<NotFoundPage />} />
         <Route path={RoutesPages.PROFILE} element={<ProfilePage />} />
         <Route path={RoutesPages.ABOUT} element={<AboutPage />} />
+        <Route path={RoutesPages.BASKET} element={<BasketPage />} />
       </Routes>
     </Router>
   );

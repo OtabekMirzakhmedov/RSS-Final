@@ -8,24 +8,33 @@ export interface Cart {
   id: string;
   version: number;
   lineItems: LineItem[];
-  totalPrice: {
-    centAmount: number;
-  };
+  totalPrice: { type: string; currencyCode: string; centAmount: number; fractionDigits: number };
+  totalLineItemQuantity: number;
 }
 
 interface LineItem {
   id: string;
+  name: {
+    'en-US': string;
+  };
   productId: string;
+  quantity: number;
+  price: {
+    value: { currencyCode: string; centAmount: number; fractionDigits: number };
+  };
+  totalPrice: { currencyCode: string; centAmount: number; fractionDigits: number };
 }
 
 export const CreateCart = async (): Promise<Cart> => {
   const initialToken = localStorage.getItem('initial_token');
-  const token = localStorage.getItem('token');
-  let tokenValue = `Bearer ${initialToken}`;
-  if (token) {
-    tokenValue = `Bearer ${token}`;
-  }
-  const url = `${host}/${projectKey}/carts`;
+  console.log(initialToken);
+  console.log('create a cart');
+  // const token = localStorage.getItem('token');
+  const tokenValue = `Bearer ${initialToken}`;
+  // if (token) {
+  //   tokenValue = `Bearer ${token}`;
+  // }
+  const url = `${host}/${projectKey}/me/carts`;
 
   try {
     const response = await axios.post<Cart>(
@@ -57,8 +66,8 @@ export const AddItemToCart = async (productId: string) => {
     tokenValue = `Bearer ${token}`;
   }
 
-  let cartId = localStorage.getItem('cartId');
-  let cartVersion = localStorage.getItem('cartVersion');
+  let cartId = localStorage.getItem('cartId')!;
+  let cartVersion = localStorage.getItem('cartVersion')!;
 
   if (!cartId || !cartVersion) {
     const newCart = await CreateCart();
@@ -66,7 +75,7 @@ export const AddItemToCart = async (productId: string) => {
     cartVersion = newCart.version.toString();
   }
 
-  const url = `${host}/${projectKey}/carts/${cartId}`;
+  const url = `${host}/${projectKey}/me/carts/${cartId}`;
 
   try {
     const response = await axios.post<Cart>(
@@ -112,7 +121,7 @@ export const CheckProductExists = async (productId: string): Promise<string | bo
     return false;
   }
 
-  const url = `${host}/${projectKey}/carts/${cartId}`;
+  const url = `${host}/${projectKey}/me/carts/${cartId}`;
 
   try {
     const response = await axios.get<Cart>(url, {
@@ -144,16 +153,16 @@ export const RemoveItemFromCart = async (lineItemId: string) => {
     tokenValue = `Bearer ${token}`;
   }
 
-  let cartId = localStorage.getItem('cartId');
-  let cartVersion = localStorage.getItem('cartVersion');
+  const cartId = localStorage.getItem('cartId')!;
+  const cartVersion = localStorage.getItem('cartVersion')!;
 
-  if (!cartId || !cartVersion) {
-    const newCart = await CreateCart();
-    cartId = newCart.id;
-    cartVersion = newCart.version.toString();
-  }
+  // if (!cartId || !cartVersion) {
+  //   const newCart = await CreateCart();
+  //   cartId = newCart.id;
+  //   cartVersion = newCart.version.toString();
+  // }
 
-  const url = `${host}/${projectKey}/carts/${cartId}`;
+  const url = `${host}/${projectKey}/me/carts/${cartId}`;
 
   try {
     const response = await axios.post<Cart>(
@@ -180,5 +189,35 @@ export const RemoveItemFromCart = async (lineItemId: string) => {
     console.log(cartData);
   } catch (error) {
     console.error('Error adding item to cart:', error);
+  }
+};
+
+export const GetCartItems = async (): Promise<Cart> => {
+  const initialToken = localStorage.getItem('initial_token');
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  const cartId = localStorage.getItem('cartId');
+  let url = `${host}/${projectKey}/me/carts/${cartId}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+    url = `${host}/${projectKey}/me/active-cart`;
+  }
+
+  try {
+    const response = await axios.get<Cart>(url, {
+      headers: {
+        Authorization: tokenValue,
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log(response);
+    const cartData = response.data;
+    console.log(cartData);
+    localStorage.setItem('cartId', cartData.id);
+    localStorage.setItem('cartVersion', cartData.version.toString());
+    return cartData;
+  } catch (error) {
+    console.error('Error creating cart:', error);
+    throw error;
   }
 };
