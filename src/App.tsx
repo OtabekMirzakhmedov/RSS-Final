@@ -9,6 +9,7 @@ import ProfilePage from './pages/profile-page/ProfilePage';
 import CatalogPage from './pages/catalog-page/CatalogPage';
 import CategoryCatalogPage from './pages/category-catalog-page/CategoryCatalogPage';
 import { RoutesPages } from './pages/pages-types/pageTypes';
+import AboutPage from './pages/about-page/AboutPage';
 
 function App() {
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -24,6 +25,7 @@ function App() {
         <Route path={RoutesPages.PRODUCT} element={<ProductDetailsPage />} />
         <Route path={RoutesPages.NOTFOUND} element={<NotFoundPage />} />
         <Route path={RoutesPages.PROFILE} element={<ProfilePage />} />
+        <Route path={RoutesPages.ABOUT} element={<AboutPage />} />
       </Routes>
     </Router>
   );

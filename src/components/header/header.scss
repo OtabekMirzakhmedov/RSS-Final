@@ -4,8 +4,11 @@
   background-color: $primary-color !important;
 }
 
+.toolbar {
+  justify-content: space-between;
+}
+
 .title {
-  flex-grow: 1;
   font-weight: bold;
   cursor: pointer;
 }
