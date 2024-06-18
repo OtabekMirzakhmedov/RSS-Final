@@ -199,6 +199,7 @@ export const GetCartItems = async (): Promise<Cart> => {
   const cartId = localStorage.getItem('cartId');
   let url = `${host}/${projectKey}/me/carts/${cartId}`;
   if (token) {
+    console.log('active cart');
     tokenValue = `Bearer ${token}`;
     url = `${host}/${projectKey}/me/active-cart`;
   }

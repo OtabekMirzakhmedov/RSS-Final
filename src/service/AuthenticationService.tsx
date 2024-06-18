@@ -143,6 +143,7 @@ export const login = async (email: string, password: string) => {
       id: cartId,
       typeId: 'cart',
     },
+    activeCartSignInMode: 'MergeWithExistingCustomerCart',
   };
 
   const config = {

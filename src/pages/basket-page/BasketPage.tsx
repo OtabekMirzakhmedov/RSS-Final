@@ -2,11 +2,10 @@
 /* eslint-disable consistent-return */
 import { useEffect, useState } from 'react';
 import {
-  // Checkbox,
+  Box,
   Container,
   CssBaseline,
-  // IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Typography,
-  Box,
+  IconButton,
   Table,
   TableHead,
   TableBody,
@@ -15,12 +14,11 @@ import {
   Button,
   Paper,
 } from '@mui/material';
-
-// import EditIcon from '@mui/icons-material/Edit';
-// import DeleteIcon from '@mui/icons-material/Delete';
-import { GetCartItems } from '../../service/CartService';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { GetCartItems, RemoveItemFromCart } from '../../service/CartService';
 import Header from '../../components/header/Header';
 import { GetProductById } from '../../service/ProductService';
+import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 
 interface LineItemType {
   id: string;
@@ -110,6 +108,20 @@ function BasketPage() {
       ) // add request for changing quantity
     );
   };
+  const [deleteProductSnackbarNeeded, setDeleteProductSnackbarNeeded] = useState(false);
+  const deleteHandler = (value: string) => async () => {
+    try {
+      await RemoveItemFromCart(value);
+      setDeleteProductSnackbarNeeded(true);
+      getCart();
+    } catch (err) {
+      setDeleteProductSnackbarNeeded(false);
+    }
+  };
+
+  const snackbarClose = () => {
+    setDeleteProductSnackbarNeeded(false);
+  };
 
   return (
     <>
@@ -172,6 +184,11 @@ function BasketPage() {
                     <TableCell>
                       {product.totalPrice.centAmount} {product.totalPrice.currencyCode}
                     </TableCell>
+                    <TableCell>
+                      <IconButton onClick={deleteHandler(product.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 ))}
                 <TableRow>
@@ -185,6 +202,9 @@ function BasketPage() {
             </Table>
           </Paper>
         </Box>
+        {deleteProductSnackbarNeeded && (
+          <SimpleSnackbar colorName='success' text='Item deleted!' closeModal={snackbarClose} />
+        )}
       </Container>
     </>
   );
