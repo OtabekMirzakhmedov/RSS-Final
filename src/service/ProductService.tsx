@@ -157,7 +157,6 @@ export async function GetProductById(productId: string): Promise<ProductDetails 
     });
 
     const productData = response.data;
-
     const cleanedProduct = ConvertToProductDetailData(productData);
     return cleanedProduct;
   } catch (error) {

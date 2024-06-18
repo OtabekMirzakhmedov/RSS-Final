@@ -2,15 +2,7 @@
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-  Button,
-  TextField,
-  Container,
-  Backdrop,
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-} from '@mui/material';
+import { Button, TextField, Container, Backdrop, CircularProgress } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { checkEmail } from '../../service/AuthenticationService';
@@ -95,12 +87,11 @@ export default function LoginPage() {
             {...register('email', {
               required: FormValidationMessages.Email.Required,
               pattern: {
-                value:
-                  /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
+                value: /^\s*[^\s]+@\S+\.\S+\s*$/,
                 message: FormValidationMessages.Email.InvalidFormat,
               },
             })}
-            type='text'
+            type='email'
             error={!!errors.email}
             helperText={errors.email ? errors.email.message : ''}
           />
@@ -130,16 +121,22 @@ export default function LoginPage() {
                   ? errors.password.type && <span>{errors.password.message}</span>
                   : ''
               }
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton onClick={togglePasswordVisibility}>
-                      {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
             />
+            <button
+              type='button'
+              onClick={togglePasswordVisibility}
+              style={{
+                position: 'absolute',
+                top: 18,
+                right: 20,
+                cursor: 'pointer',
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+              }}
+            >
+              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </button>
           </div>
 
           <Button size='medium' variant='contained' color='secondary' type='submit'>

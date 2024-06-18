@@ -18,14 +18,13 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import FormValidationMessages from '../pages-types/validateTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
-import { addAddress, setDetailedAddress } from '../../service/ProfileService';
+import { addAddress, addShippingAddress, addBillingAddress } from '../../service/ProfileService';
 
 interface AddressForm {
   street: string;
   city: string;
   country: string;
   postal: string;
-  defaultAddress: boolean;
 }
 
 interface AddAddressType {
@@ -44,12 +43,6 @@ interface AddressIdActionType {
   action: 'addBillingAddressId' | 'addShippingAddressId';
   addressId: string;
 }
-
-interface DefaultActionType {
-  action: 'setDefaultShippingAddress' | 'setDefaultBillingAddress';
-  addressId: string;
-}
-
 interface Response {
   success: boolean;
   message: string;
@@ -118,7 +111,6 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
       address: addressData,
     };
     actions.push(action);
-
     try {
       const response: Response = await addAddress(actions);
       if (response.success && response.newAddressId) {
@@ -126,18 +118,11 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
           action: actionType,
           addressId: response.newAddressId,
         };
-
-        if (data.defaultAddress) {
-          const defaultAction: DefaultActionType = {
-            action:
-              actionType === 'addShippingAddressId'
-                ? 'setDefaultShippingAddress'
-                : 'setDefaultBillingAddress',
-            addressId: response.newAddressId,
-          };
-          await setDetailedAddress([addressIdAction, defaultAction]);
-        } else {
-          await setDetailedAddress([addressIdAction]);
+        if (actionType === 'addBillingAddressId') {
+          await addBillingAddress([addressIdAction]);
+        }
+        if (actionType === 'addShippingAddressId') {
+          await addShippingAddress([addressIdAction]);
         }
 
         setAddressSnackbarNeeded(true);
@@ -182,16 +167,10 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
               padding: '20px',
             }}
           >
-            {actionType === 'addShippingAddressId' && (
-              <h2 id='simple-modal-title'>Shipping Address Creation</h2>
-            )}
-            {actionType === 'addBillingAddressId' && (
-              <h2 id='simple-modal-title'>Billing Address Creation</h2>
-            )}
+            <h2 id='simple-modal-title'>Address Creation</h2>
             <form id='simple-modal-description' onSubmit={handleSubmit(onSubmit)}>
               <Grid item xs={12}>
                 <TextField
-                  size='small'
                   margin='normal'
                   fullWidth
                   label='Street'
@@ -210,8 +189,6 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  size='small'
-                  fullWidth
                   margin='normal'
                   type='text'
                   label='City'
@@ -232,7 +209,7 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
                 />
               </Grid>
               <Grid item xs={12}>
-                <FormControl size='small' fullWidth margin='normal'>
+                <FormControl fullWidth margin='normal'>
                   <InputLabel id='country-label'>Country</InputLabel>
                   <Select
                     labelId='country-label'
@@ -250,7 +227,6 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  size='small'
                   margin='normal'
                   fullWidth
                   label='Postal Code'
@@ -263,41 +239,29 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
                   helperText={errors.postal ? errors.postal.message : ''}
                 />
               </Grid>
-              {actionType === 'addShippingAddressId' && (
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={<Checkbox {...register('defaultAddress')} defaultChecked={false} />}
-                    label='Default Shipping Address'
-                  />
-                </Grid>
-              )}
-              {actionType === 'addBillingAddressId' && (
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={<Checkbox {...register('defaultAddress')} defaultChecked={false} />}
-                    label='Default Billing Address'
-                  />
-                </Grid>
-              )}
-
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={<Checkbox defaultChecked={false} />}
+                  label='Default Shipping Address'
+                />
+              </Grid>
+              {/* {...register('defaultAddress')} */}
               <Button
-                fullWidth
                 type='submit'
                 style={{ margin: 10, alignSelf: 'flex-end' }}
                 variant='contained'
                 color='success'
               >
-                Save address
+                Save changes
               </Button>
             </form>
             <Button
-              fullWidth
               style={{ margin: 10, alignSelf: 'flex-end' }}
               variant='contained'
               color='error'
               onClick={handleClose}
             >
-              Cancel
+              Cancel changes
             </Button>
           </div>
         </Modal>
@@ -319,3 +283,39 @@ export default function AddAddressMOdal({ setAddressModalFalse, getUserInfo, act
     </Container>
   );
 }
+
+// const shippingAddress: Address = {
+//   streetName: data.shippingStreet,
+//   city: data.shippingCity,
+//   country: data.shippingCountry,
+//   postalCode: data.shippingPostal,
+// };
+// const formData: SignupData = {
+//   email: data.email,
+//   firstName: data.firstName,
+//   lastName: data.lastName,
+//   password: data.password,
+//   dateOfBirth: data.birthDate,
+//   addresses: [shippingAddress],
+// };
+
+// if (!data.defaultBillingAddress) {
+//   const billingAddress: Address = {
+//     streetName: data.billingStreet,
+//     city: data.billingCity,
+//     country: data.billingCountry,
+//     postalCode: data.billingPostal,
+//   };
+//   formData.addresses.push(billingAddress);
+// }
+
+// if (data.defaultShippingAddress) {
+//   formData.defaultShippingAddress = 0;
+// }
+// if (data.defaultBillingAddress) {
+//   formData.defaultBillingAddress = 0;
+// }
+
+// if (!data.defaultBillingAddress && data.defaultBillingAddress2) {
+//   formData.defaultBillingAddress = 1;
+// }
