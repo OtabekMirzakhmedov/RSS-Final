@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import axios from 'axios';
+// import { getAccessToken } from './AuthenticationService';
 
 const projectKey = 'rss-final-commerce';
 const host = 'https://api.eu-central-1.aws.commercetools.com';
@@ -55,7 +56,7 @@ export interface ProductDetails {
   id: string;
   title: string;
   author?: string;
-  images?: string[];
+  images: string[];
   price: number;
   discount?: number;
   description: string;
@@ -127,6 +128,7 @@ export async function GetProducts(
   } else if (sortOption) {
     url = `${url}/search?sort=${sortOption}`;
   }
+  console.log(tokenValue);
 
   try {
     const response = await axios.get<ProductResponse>(url, {

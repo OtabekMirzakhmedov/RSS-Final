@@ -26,7 +26,6 @@ import { RoutesPages } from '../pages-types/pageTypes';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import { deleteAddress, getUser, updateUser } from '../../service/ProfileService';
 import PasswordModal from './PasswordModal';
-import './profile.css';
 import AddressModal from './AddressModal';
 
 interface Props {
