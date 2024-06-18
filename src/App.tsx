@@ -11,6 +11,7 @@ import CategoryCatalogPage from './pages/category-catalog-page/CategoryCatalogPa
 import { RoutesPages } from './pages/pages-types/pageTypes';
 import BasketPage from './pages/basket-page/BasketPage';
 import { getAccessToken } from './service/AuthenticationService';
+import AboutPage from './pages/about-page/AboutPage';
 
 function App() {
   if (!localStorage.getItem('initial_token')) {
@@ -29,6 +30,7 @@ function App() {
         <Route path={RoutesPages.NOTFOUND} element={<NotFoundPage />} />
         <Route path={RoutesPages.PROFILE} element={<ProfilePage />} />
         <Route path={RoutesPages.BASKET} element={<BasketPage />} />
+        <Route path={RoutesPages.ABOUT} element={<AboutPage />} />
       </Routes>
     </Router>
   );

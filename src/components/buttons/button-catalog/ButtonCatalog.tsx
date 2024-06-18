@@ -17,7 +17,10 @@ export default function ButtonCatalog() {
       variant='contained'
       color='secondary'
       endIcon={<StoreIcon />}
-      disabled={location.pathname === RoutesPages.LOGIN.toString()}
+      disabled={
+        location.pathname === RoutesPages.LOGIN.toString() ||
+        location.pathname === RoutesPages.CATALOG.toString()
+      }
       onClick={handleLoginClick}
     >
       Catalog

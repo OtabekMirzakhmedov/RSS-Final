@@ -30,11 +30,11 @@ function Header() {
 
   return (
     <AppBar position='static' className='app-bar'>
-      <Toolbar>
+      <Toolbar className='toolbar'>
         <Typography variant='h4' component='div' className='title' onClick={handleLogoClick}>
           HardBooks
         </Typography>
-        <Box className='button-box' sx={{ display: { xs: 'none', sm: 'flex' } }}>
+        <Box className='button-box' sx={{ display: { xs: 'none', md: 'flex' } }}>
           <ButtonAbout />
           {isLoggedin ? (
             <>
@@ -56,7 +56,7 @@ function Header() {
           edge='end'
           color='inherit'
           aria-label='menu'
-          sx={{ display: { xs: 'flex', sm: 'none' } }}
+          sx={{ display: { xs: 'flex', md: 'none' } }}
           onClick={() => setIsDrawerOpen(true)}
         >
           <MenuIcon />
@@ -66,7 +66,7 @@ function Header() {
         anchor='right'
         open={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        sx={{ display: { xs: 'flex', sm: 'none' } }}
+        sx={{ display: { xs: 'flex', md: 'none' } }}
       >
         <IconButton onClick={() => setIsDrawerOpen(false)}>
           <ChevronRightIcon />
