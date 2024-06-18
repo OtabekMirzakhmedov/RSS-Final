@@ -56,7 +56,7 @@ function ProductDetailsPage() {
       const productDetails = await GetProductById(productId!);
       if (productDetails) {
         setProduct(productDetails);
-        setMainImage(productDetails.images![0]!);
+        setMainImage(productDetails.images[0]!);
       } else {
         setError('Failed to fetch product details');
       }

@@ -1,18 +1,22 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/login-page/LoginPage';
 import RegistrationPage from './pages/registration-page/RegistrationPage';
 import NotFoundPage from './pages/not-found-page/NotFoundPage';
 import MainPage from './pages/main-page/MainPage';
 import ProductDetailsPage from './pages/product-details-page/ProductDetailsPage';
-import { getAccessToken } from './service/AuthenticationService';
 import ProfilePage from './pages/profile-page/ProfilePage';
 import CatalogPage from './pages/catalog-page/CatalogPage';
 import CategoryCatalogPage from './pages/category-catalog-page/CategoryCatalogPage';
 import { RoutesPages } from './pages/pages-types/pageTypes';
+import BasketPage from './pages/basket-page/BasketPage';
+import { getAccessToken } from './service/AuthenticationService';
 
 function App() {
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  getAccessToken();
+  if (!localStorage.getItem('initial_token')) {
+    getAccessToken();
+  }
+
   return (
     <Router>
       <Routes>
@@ -24,6 +28,7 @@ function App() {
         <Route path={RoutesPages.PRODUCT} element={<ProductDetailsPage />} />
         <Route path={RoutesPages.NOTFOUND} element={<NotFoundPage />} />
         <Route path={RoutesPages.PROFILE} element={<ProfilePage />} />
+        <Route path={RoutesPages.BASKET} element={<BasketPage />} />
       </Routes>
     </Router>
   );

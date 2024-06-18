@@ -32,6 +32,19 @@ interface CreateUserResponse {
   };
 }
 
+interface LoginUserResponse {
+  cart: {
+    id: string;
+    version: number;
+    customerId: string;
+    anonymousId: string;
+  };
+  customer: {
+    id: string;
+    version: number;
+  };
+}
+
 interface ApiResponse {
   success: boolean;
   message: string;
@@ -51,7 +64,7 @@ interface EmailVerifyResponse {
 export const getAccessToken = async () => {
   try {
     const response: AxiosResponse<InitialTokenResponse> = await axios.post<TokenResponse>(
-      `${authUrl}/oauth/token`,
+      `${authUrl}/oauth/${projectKey}/anonymous/token`,
       '',
       {
         params: {
@@ -77,7 +90,7 @@ export const getAccessToken = async () => {
   }
 };
 
-export const login = async (email: string, password: string) => {
+export const getPasswordToken = async (email: string, password: string) => {
   let result = null;
 
   try {
@@ -95,6 +108,7 @@ export const login = async (email: string, password: string) => {
         },
       }
     );
+    console.log(response.data.access_token);
     localStorage.setItem('token', response.data.access_token);
     localStorage.setItem('refresh_token', response.data.refresh_token);
   } catch (error) {
@@ -112,6 +126,56 @@ export const login = async (email: string, password: string) => {
     }
   }
   return result;
+};
+
+export const login = async (email: string, password: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  getAccessToken();
+  const cartId = localStorage.getItem('cartId');
+  console.log(cartId);
+  const initialToken = localStorage.getItem('initial_token');
+  const tokenValue = initialToken ? `Bearer ${initialToken}` : '';
+
+  const data = {
+    email,
+    password,
+    anonymousCart: {
+      id: cartId,
+      typeId: 'cart',
+    },
+  };
+
+  const config = {
+    method: 'post',
+    url: `${host}/${projectKey}/me/login`,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: tokenValue,
+    },
+    data,
+  };
+
+  try {
+    const resp = await axios.request<LoginUserResponse>(config);
+    console.log(resp);
+    localStorage.setItem('id', resp.data.customer.id);
+    localStorage.setItem('version', resp.data.customer.version.toString());
+    return {
+      success: true,
+      message: 'Account created successfully!',
+    };
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+    return {
+      success: false,
+      message: 'An error occurred during registration.',
+    };
+  }
 };
 
 export const checkEmail = async (emailAddress: string, password: string) => {
@@ -137,10 +201,10 @@ export const checkEmail = async (emailAddress: string, password: string) => {
 
     if (response.data.count === 1) {
       errorText = 'No error!';
-      console.log(response.data.results[0].id);
       localStorage.setItem('id', response.data.results[0].id);
       localStorage.setItem('version', response.data.results[0].version.toString());
-      const resp = await login(emailAddress, password);
+      await login(emailAddress, password);
+      const resp = await getPasswordToken(emailAddress, password);
       if (resp === ResponseCode.BadRequest) {
         errorText = ResponseCheck.WrongPassword;
       }
@@ -170,6 +234,7 @@ export const createAccount = async (signUpData: SignupData): Promise<ApiResponse
 
   try {
     const resp = await axios.request<CreateUserResponse>(config);
+    console.log(resp);
     localStorage.setItem('id', resp.data.customer.id);
     localStorage.setItem('version', resp.data.customer.version.toString());
     return {

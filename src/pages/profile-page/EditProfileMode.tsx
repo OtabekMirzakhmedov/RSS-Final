@@ -113,7 +113,6 @@ function EditProfileMode({ exitEditMode, updateData }: Props) {
       changedData.addresses.forEach((address) => {
         if (id === address.id) {
           if (changedData.defaultBillingAddressId === id) {
-
             address.default = 'default';
           }
           billingAddresses.push(address);

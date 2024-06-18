@@ -1,24 +1,24 @@
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate, useLocation, NavigateFunction } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import { RoutesPages } from '../../../pages/pages-types/pageTypes';
 
-export default function ButtonProfile() {
+export default function ButtonBasket() {
   const navigate: NavigateFunction = useNavigate();
 
   const location = useLocation();
 
-  const handleClick = () => {
-    navigate(RoutesPages.PROFILE);
+  const handleBasketClick = () => {
+    navigate(RoutesPages.BASKET);
   };
 
   return (
     <IconButton
-      color='success'
-      disabled={location.pathname === RoutesPages.PROFILE.toString()}
-      onClick={handleClick}
+      color='default'
+      disabled={location.pathname === RoutesPages.BASKET.toString()}
+      onClick={handleBasketClick}
     >
-      <AccountCircleIcon />
+      <ShoppingCartIcon />
     </IconButton>
   );
 }

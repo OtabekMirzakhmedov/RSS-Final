@@ -17,6 +17,7 @@ import ButtonCatalog from '../buttons/button-catalog/ButtonCatalog';
 import './header.scss';
 import ButtonProfile from '../buttons/button-profile/ButtonProfile';
 import ButtonAbout from '../buttons/button-about/ButtonAbout';
+import ButtonBasket from '../buttons/button-basket/ButtonBasket';
 
 function Header() {
   const navigate: NavigateFunction = useNavigate();
@@ -37,8 +38,8 @@ function Header() {
           <ButtonAbout />
           {isLoggedin ? (
             <>
-              <ButtonProfile />
               <ButtonCatalog />
+              <ButtonProfile />
               <ButtonLogout />
             </>
           ) : (
@@ -48,6 +49,7 @@ function Header() {
               <ButtonRegister />
             </>
           )}
+          <ButtonBasket />
         </Box>
         <IconButton
           className='burger'
