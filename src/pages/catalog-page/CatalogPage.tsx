@@ -42,7 +42,7 @@ function CatalogPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [triggerSearch, setTriggerSearch] = useState<number>(0); // New state for search trigger
   const [addingToCart, setAddingToCart] = useState<boolean>(false);
-  const [snackbarMessage, setSnackbarMessage] = useState<string>('')ж
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   const navigate: NavigateFunction = useNavigate();
 
   const fetchProducts = async (sortOption: string, searchQuery: string) => {
