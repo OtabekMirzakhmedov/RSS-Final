@@ -15,7 +15,7 @@ import {
   Paper,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { GetCartItems, RemoveItemFromCart } from '../../service/CartService';
+import { ChangeItemQuantity, GetCartItems, RemoveItemFromCart } from '../../service/CartService';
 import Header from '../../components/header/Header';
 import { GetProductById } from '../../service/ProductService';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
@@ -93,21 +93,28 @@ function BasketPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartItems]);
 
-  const incrementQuantity = (id: string) => {
+  const incrementQuantity = async (id: string, quantity: number) => {
     setCartItems(
       cartItems.map((product) =>
         product.id === id ? { ...product, quantity: product.quantity + 1 } : product
-      ) // add request for changing quantity
+      )
     );
+
+    await ChangeItemQuantity(id, quantity + 1);
+    await getCart();
   };
 
-  const decrementQuantity = (id: string) => {
+  const decrementQuantity = async (id: string, quantity: number) => {
     setCartItems(
       cartItems.map((product) =>
         product.id === id ? { ...product, quantity: Math.max(1, product.quantity - 1) } : product
-      ) // add request for changing quantity
+      )
     );
+
+    await ChangeItemQuantity(id, quantity - 1);
+    await getCart();
   };
+
   const [deleteProductSnackbarNeeded, setDeleteProductSnackbarNeeded] = useState(false);
   const deleteHandler = (value: string) => async () => {
     try {
@@ -173,11 +180,17 @@ function BasketPage() {
                       {product.price.value.centAmount} {product.price.value.currencyCode}
                     </TableCell>
                     <TableCell style={{ height: '128.5px', display: 'flex', alignItems: 'center' }}>
-                      <Button type='button' onClick={() => decrementQuantity(product.id)}>
+                      <Button
+                        type='button'
+                        onClick={() => decrementQuantity(product.id, product.quantity)}
+                      >
                         -
                       </Button>
                       {product.quantity}
-                      <Button type='button' onClick={() => incrementQuantity(product.id)}>
+                      <Button
+                        type='button'
+                        onClick={() => incrementQuantity(product.id, product.quantity)}
+                      >
                         +
                       </Button>
                     </TableCell>
