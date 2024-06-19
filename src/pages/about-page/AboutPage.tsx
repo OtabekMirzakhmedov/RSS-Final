@@ -66,12 +66,17 @@ export default function AboutPage() {
               <CardHeader avatar={<Avatar src='/nastya.jpeg' />} />
               <CardContent sx={{ flex: '1 1 auto' }}>
                 <Typography variant='h4'>Nasta Voronova</Typography>
-                <Typography variant='h5'>Бекенд-разработчик</Typography>
+                <Typography variant='h5'>Head of Logistics Department</Typography>
                 <Typography variant='body1' marginBottom='20px'>
-                  Краткая биография о...
+                  She graduated from Belarussian State Unversity in 2014 with a degree in customs
+                  affairs. Since then she worked as a customs declarant for 5 years. Since 2019 till
+                  now she works as head of logistics department in Hess GS(Swiss subsidiary).
                 </Typography>
                 <Typography variant='h5'>Contribution</Typography>
-                <Typography variant='body1'>Something...</Typography>
+                <Typography variant='body1'>
+                  She implemented a login, profile and basket pages, coped with understanding the
+                  basics of react, helped to understand commerstools possibilities.
+                </Typography>
               </CardContent>
               <CardActions>
                 <Link

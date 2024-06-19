@@ -252,3 +252,31 @@ export const ChangeItemQuantity = async (lineItemId: string, quantity: number): 
     throw error;
   }
 };
+
+export const DeleteCart = async (): Promise<Cart> => {
+  const cartId = localStorage.getItem('cartId')!;
+  const cartVersion = localStorage.getItem('cartVersion')!;
+  const initialToken = localStorage.getItem('initial_token');
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
+  const url = `${host}/${projectKey}/me/carts/${cartId}?version=${cartVersion}`;
+
+  try {
+    const response = await axios.delete<Cart>(url, {
+      headers: {
+        Authorization: tokenValue,
+        'Content-Type': 'application/json',
+      },
+    });
+    const cartData = response.data;
+    localStorage.setItem('cartId', cartData.id);
+    localStorage.setItem('cartVersion', cartData.version.toString());
+    return cartData;
+  } catch (error) {
+    console.error('Error creating cart:', error);
+    throw error;
+  }
+};

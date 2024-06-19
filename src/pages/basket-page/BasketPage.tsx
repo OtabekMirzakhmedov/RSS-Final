@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable consistent-return */
 import { useEffect, useState } from 'react';
+import './basket.scss';
 import {
   Box,
   Container,
@@ -17,7 +18,13 @@ import {
   Backdrop,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ChangeItemQuantity, GetCartItems, RemoveItemFromCart } from '../../service/CartService';
+import {
+  ChangeItemQuantity,
+  CreateCart,
+  DeleteCart,
+  GetCartItems,
+  RemoveItemFromCart,
+} from '../../service/CartService';
 import Header from '../../components/header/Header';
 import { GetProductById } from '../../service/ProductService';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
@@ -151,6 +158,17 @@ function BasketPage() {
     setDeleteProductSnackbarNeeded(false);
   };
 
+  const deleteCart = async () => {
+    try {
+      await DeleteCart();
+      await CreateCart();
+      getCart();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error deleting cart:', err);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -158,7 +176,6 @@ function BasketPage() {
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 2,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-start',
@@ -186,79 +203,122 @@ function BasketPage() {
             </Paper>
           )}
           {emptyCart && (
-            <Paper
-              style={{
-                boxShadow: 'none',
-                width: '100%',
-                marginTop: 20,
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-            >
-              <Table
+            <>
+              <div
                 style={{
-                  minWidth: 850,
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  width: '400px',
                 }}
               >
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Product</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell>Quantity</TableCell>
-                    <TableCell>Total</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {cartItems.map((product, index) => (
-                    <TableRow key={product.id}>
-                      <TableCell>
-                        <img
-                          src={images[index]}
-                          alt={product.name['en-US']}
-                          style={{ width: '50px', margin: '10px', float: 'left' }}
-                        />
-                        <span>{product.name['en-US']}</span>
+                <h1
+                  style={{
+                    width: '100%',
+                  }}
+                >
+                  Your shopping cart
+                </h1>
+                <IconButton
+                  style={{
+                    alignItems: 'center',
+                  }}
+                  onClick={deleteCart}
+                >
+                  <p>clear all</p>
+                  <DeleteIcon />
+                </IconButton>
+              </div>
+              <Paper
+                style={{
+                  boxShadow: 'none',
+                  width: '100%',
+                  marginTop: 20,
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
+                <Table
+                  className='table'
+                  style={{
+                    minWidth: 850,
+                  }}
+                >
+                  <TableHead className='cell'>
+                    <TableRow className='cell'>
+                      <TableCell>Product</TableCell>
+                      <TableCell>Price</TableCell>
+                      <TableCell align='center'>Quantity</TableCell>
+                      <TableCell>Total</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {cartItems.map((product, index) => (
+                      <TableRow className='cell' key={product.id}>
+                        <TableCell>
+                          <img
+                            src={images[index]}
+                            alt={product.name['en-US']}
+                            style={{ width: '50px', margin: '10px', float: 'left' }}
+                          />
+                          <span>{product.name['en-US']}</span>
+                        </TableCell>
+                        <TableCell className='cell'>
+                          {product.price.value.centAmount} {product.price.value.currencyCode}
+                        </TableCell>
+                        <TableCell
+                          className='cell'
+                          style={{ height: '128.5px', display: 'flex', alignItems: 'center' }}
+                        >
+                          <Button
+                            type='button'
+                            onClick={() => decrementQuantity(product.id, product.quantity)}
+                          >
+                            -
+                          </Button>
+                          {product.quantity}
+                          <Button
+                            type='button'
+                            onClick={() => incrementQuantity(product.id, product.quantity)}
+                          >
+                            +
+                          </Button>
+                        </TableCell>
+                        <TableCell className='cell'>
+                          {product.totalPrice.centAmount} {product.totalPrice.currencyCode}
+                        </TableCell>
+                        <TableCell
+                          className='cell'
+                          style={{
+                            border: 'none',
+                          }}
+                        >
+                          <IconButton onClick={deleteHandler(product.id)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow className='cell'>
+                      <TableCell align='right' colSpan={2}>
+                        <h4>Total</h4>
                       </TableCell>
-                      <TableCell>
-                        {product.price.value.centAmount} {product.price.value.currencyCode}
+                      <TableCell align='center' colSpan={1}>
+                        <h4>{cartData?.totalLineItemQuantity}</h4>
                       </TableCell>
                       <TableCell
-                        style={{ height: '128.5px', display: 'flex', alignItems: 'center' }}
+                        style={{
+                          display: 'flex',
+                        }}
                       >
-                        <Button
-                          type='button'
-                          onClick={() => decrementQuantity(product.id, product.quantity)}
-                        >
-                          -
-                        </Button>
-                        {product.quantity}
-                        <Button
-                          type='button'
-                          onClick={() => incrementQuantity(product.id, product.quantity)}
-                        >
-                          +
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        {product.totalPrice.centAmount} {product.totalPrice.currencyCode}
-                      </TableCell>
-                      <TableCell>
-                        <IconButton onClick={deleteHandler(product.id)}>
-                          <DeleteIcon />
-                        </IconButton>
+                        <h4>
+                          {cartData?.totalPrice.centAmount} {cartData?.totalPrice.currencyCode}
+                        </h4>
                       </TableCell>
                     </TableRow>
-                  ))}
-                  <TableRow>
-                    <TableCell colSpan={2}>Total</TableCell>
-                    <TableCell colSpan={2}>{cartData?.totalLineItemQuantity}</TableCell>
-                    <TableCell>
-                      {cartData?.totalPrice.centAmount} {cartData?.totalPrice.currencyCode}
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </Paper>
+                  </TableBody>
+                </Table>
+              </Paper>
+            </>
           )}
         </Box>
         {deleteProductSnackbarNeeded && (
