@@ -81,6 +81,9 @@ function Header() {
                 <ButtonCatalog />
               </ListItem>
               <ListItem>
+                <ButtonProfile />
+              </ListItem>
+              <ListItem>
                 <ButtonLogout />
               </ListItem>
             </>
@@ -97,6 +100,9 @@ function Header() {
               </ListItem>
             </>
           )}
+          <ListItem>
+            <ButtonBasket />
+          </ListItem>
         </List>
       </Drawer>
     </AppBar>

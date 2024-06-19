@@ -27,13 +27,11 @@ interface LineItem {
 
 export const CreateCart = async (): Promise<Cart> => {
   const initialToken = localStorage.getItem('initial_token');
-  console.log(initialToken);
-  console.log('create a cart');
-  // const token = localStorage.getItem('token');
-  const tokenValue = `Bearer ${initialToken}`;
-  // if (token) {
-  //   tokenValue = `Bearer ${token}`;
-  // }
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
   const url = `${host}/${projectKey}/me/carts`;
 
   try {
@@ -47,7 +45,6 @@ export const CreateCart = async (): Promise<Cart> => {
         },
       }
     );
-    console.log(response);
     const cartData = response.data;
     localStorage.setItem('cartId', cartData.id);
     localStorage.setItem('cartVersion', cartData.version.toString());
@@ -100,7 +97,6 @@ export const AddItemToCart = async (productId: string) => {
     const cartData = response.data;
     localStorage.setItem('cartId', cartData.id);
     localStorage.setItem('cartVersion', cartData.version.toString());
-    console.log(cartData);
   } catch (error) {
     console.error('Error adding item to cart:', error);
   }
@@ -156,12 +152,6 @@ export const RemoveItemFromCart = async (lineItemId: string) => {
   const cartId = localStorage.getItem('cartId')!;
   const cartVersion = localStorage.getItem('cartVersion')!;
 
-  // if (!cartId || !cartVersion) {
-  //   const newCart = await CreateCart();
-  //   cartId = newCart.id;
-  //   cartVersion = newCart.version.toString();
-  // }
-
   const url = `${host}/${projectKey}/me/carts/${cartId}`;
 
   try {
@@ -186,7 +176,6 @@ export const RemoveItemFromCart = async (lineItemId: string) => {
     const cartData = response.data;
     localStorage.setItem('cartId', cartData.id);
     localStorage.setItem('cartVersion', cartData.version.toString());
-    console.log(cartData);
   } catch (error) {
     console.error('Error adding item to cart:', error);
   }
@@ -211,9 +200,78 @@ export const GetCartItems = async (): Promise<Cart> => {
         'Content-Type': 'application/json',
       },
     });
-    console.log(response);
     const cartData = response.data;
-    console.log(cartData);
+    localStorage.setItem('cartId', cartData.id);
+    localStorage.setItem('cartVersion', cartData.version.toString());
+    return cartData;
+  } catch (error) {
+    console.error('Error creating cart:', error);
+    throw error;
+  }
+};
+
+export const ChangeItemQuantity = async (lineItemId: string, quantity: number): Promise<Cart> => {
+  const initialToken = localStorage.getItem('initial_token');
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
+
+  const cartId = localStorage.getItem('cartId')!;
+  const cartVersion = localStorage.getItem('cartVersion')!;
+
+  const url = `${host}/${projectKey}/me/carts/${cartId}`;
+
+  try {
+    const response = await axios.post<Cart>(
+      url,
+      {
+        version: parseInt(cartVersion, 10),
+        actions: [
+          {
+            action: 'changeLineItemQuantity',
+            lineItemId,
+            quantity,
+          },
+        ],
+      },
+      {
+        headers: {
+          Authorization: tokenValue,
+        },
+      }
+    );
+
+    const cartData = response.data;
+    localStorage.setItem('cartId', cartData.id);
+    localStorage.setItem('cartVersion', cartData.version.toString());
+    return cartData;
+  } catch (error) {
+    console.error('Error adding item to cart:', error);
+    throw error;
+  }
+};
+
+export const DeleteCart = async (): Promise<Cart> => {
+  const cartId = localStorage.getItem('cartId')!;
+  const cartVersion = localStorage.getItem('cartVersion')!;
+  const initialToken = localStorage.getItem('initial_token');
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
+  const url = `${host}/${projectKey}/me/carts/${cartId}?version=${cartVersion}`;
+
+  try {
+    const response = await axios.delete<Cart>(url, {
+      headers: {
+        Authorization: tokenValue,
+        'Content-Type': 'application/json',
+      },
+    });
+    const cartData = response.data;
     localStorage.setItem('cartId', cartData.id);
     localStorage.setItem('cartVersion', cartData.version.toString());
     return cartData;

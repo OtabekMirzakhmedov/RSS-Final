@@ -148,7 +148,11 @@ export async function GetProducts(
 
 export async function GetProductById(productId: string): Promise<ProductDetails | null> {
   const initialToken = localStorage.getItem('initial_token');
-  const tokenValue = `Bearer ${initialToken}`;
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
   const url = `${host}/${projectKey}/product-projections/${productId}`;
 
   try {
