@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 import axios from 'axios';
+// import { getAccessToken } from './AuthenticationService';
 
 const projectKey = 'rss-final-commerce';
 const host = 'https://api.eu-central-1.aws.commercetools.com';
 
-interface RawProduct {
+export interface RawProduct {
   id: string;
   name: {
     'en-US': string;
@@ -55,7 +56,7 @@ export interface ProductDetails {
   id: string;
   title: string;
   author?: string;
-  images?: string[];
+  images: string[];
   price: number;
   discount?: number;
   description: string;
@@ -127,6 +128,7 @@ export async function GetProducts(
   } else if (sortOption) {
     url = `${url}/search?sort=${sortOption}`;
   }
+  console.log(tokenValue);
 
   try {
     const response = await axios.get<ProductResponse>(url, {
@@ -136,9 +138,7 @@ export async function GetProducts(
     });
 
     const productData = response.data;
-    // console.log(productData.results);
     const cleanedProducts = ConvertToMainPageProductData(productData.results);
-    // console.log(cleanedProducts);
     return cleanedProducts;
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -148,7 +148,11 @@ export async function GetProducts(
 
 export async function GetProductById(productId: string): Promise<ProductDetails | null> {
   const initialToken = localStorage.getItem('initial_token');
-  const tokenValue = `Bearer ${initialToken}`;
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
   const url = `${host}/${projectKey}/product-projections/${productId}`;
 
   try {
@@ -159,9 +163,7 @@ export async function GetProductById(productId: string): Promise<ProductDetails 
     });
 
     const productData = response.data;
-    console.log(productData);
     const cleanedProduct = ConvertToProductDetailData(productData);
-    console.log(cleanedProduct);
     return cleanedProduct;
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -198,9 +200,7 @@ export async function GetCategoryProducts(
     });
 
     const productData = response.data;
-    // console.log(productData.results);
     const cleanedProducts = ConvertToMainPageProductData(productData.results);
-    // console.log(cleanedProducts);
     return cleanedProducts;
   } catch (error) {
     console.error('Error fetching products:', error);

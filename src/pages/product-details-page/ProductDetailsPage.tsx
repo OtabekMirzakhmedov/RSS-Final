@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable no-console */
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
@@ -15,9 +17,12 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  CardActions,
 } from '@mui/material';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import Header from '../../components/header/Header';
 import { GetProductById, ProductDetails } from '../../service/ProductService';
+import { AddItemToCart, CheckProductExists, RemoveItemFromCart } from '../../service/CartService';
 
 function ProductDetailsPage() {
   const { productId } = useParams<{ productId: string }>();
@@ -27,29 +32,73 @@ function ProductDetailsPage() {
   const [mainImage, setMainImage] = useState<string>('');
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isInCart, setIsInCart] = useState(false);
+  const [lineItemId, setLineItemId] = useState('');
 
-  useEffect(() => {
-    const fetchProductDetails = async () => {
-      setLoading(true);
+  const checkIfProductIsInCart = async () => {
+    try {
+      const check = await CheckProductExists(productId!);
+      if (typeof check === 'string') {
+        setLineItemId(check);
+        setIsInCart(true);
+      } else {
+        setIsInCart(false);
+      }
+    } catch (err) {
+      console.error('Error checking product in cart:', err);
+      setIsInCart(false);
+    }
+  };
+
+  const fetchProductDetails = async () => {
+    setLoading(true);
+    try {
       const productDetails = await GetProductById(productId!);
       if (productDetails) {
         setProduct(productDetails);
-        setMainImage(productDetails.images![0]!);
+        setMainImage(productDetails.images[0]!);
       } else {
         setError('Failed to fetch product details');
       }
+    } catch (err) {
+      console.error('Error fetching product details:', err);
+      setError('Failed to fetch product details');
+    } finally {
       setLoading(false);
-    };
+    }
+  };
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchProductDetails();
+  useEffect(() => {
+    checkIfProductIsInCart().then(() => {
+      fetchProductDetails();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
+
+  const handleAddToCart = async () => {
+    try {
+      await AddItemToCart(productId!);
+      setIsInCart(true);
+    } catch (err) {
+      console.error('Error adding item to cart:', err);
+    }
+  };
+
+  const handleRemoveFromCart = async () => {
+    try {
+      await RemoveItemFromCart(lineItemId);
+      setIsInCart(false);
+    } catch (err) {
+      console.error('Error removing item from cart:', err);
+    }
+  };
 
   const handleImageClick = (imageUrl: string, index: number) => {
     setMainImage(imageUrl);
     setSelectedIndex(index);
     setOpenDialog(true);
   };
+
   const handleSmallImageClick = (imageUrl: string, index: number) => {
     setMainImage(imageUrl);
     setSelectedIndex(index);
@@ -156,6 +205,22 @@ function ProductDetailsPage() {
           </Grid>
           <Grid item xs={12} md={8}>
             <Card style={{ display: 'flex', flexDirection: 'column' }}>
+              <CardActions>
+                {isInCart ? (
+                  <Button variant='outlined' color='error' onClick={handleRemoveFromCart}>
+                    Remove from Cart
+                  </Button>
+                ) : (
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    startIcon={<AddShoppingCartIcon />}
+                    onClick={handleAddToCart}
+                  >
+                    Add to Cart
+                  </Button>
+                )}
+              </CardActions>
               <CardContent>
                 <Typography variant='h5' gutterBottom>
                   {product.title}

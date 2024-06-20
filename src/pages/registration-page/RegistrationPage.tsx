@@ -30,7 +30,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import { createAccount, login } from '../../service/AuthenticationService';
+import { createAccount, getPasswordToken, login } from '../../service/AuthenticationService';
 import Header from '../../components/header/Header';
 import { RoutesPages } from '../pages-types/pageTypes';
 import FormValidationMessages from '../pages-types/validateTypes';
@@ -181,6 +181,7 @@ function RegistrationPage() {
         setSnackbarMessage('Account created successfully!');
         setSnackbarOpen(true);
         await login(data.email, data.password);
+        await getPasswordToken(data.email, data.password);
         navigate(RoutesPages.HOME);
       }
     } catch (err) {

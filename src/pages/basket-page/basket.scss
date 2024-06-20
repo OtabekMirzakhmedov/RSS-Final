@@ -1,0 +1,13 @@
+.table {
+  overflow-y: auto;
+}
+
+.cell {
+  display: flex;
+  text-align: right;
+}
+
+//   @media screen and (max-width: 600px) {
+//     .cell {
+//     }
+// }

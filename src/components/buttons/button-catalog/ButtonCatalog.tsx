@@ -1,4 +1,5 @@
 import Button from '@mui/material/Button';
+import StoreIcon from '@mui/icons-material/Store';
 import { useNavigate, useLocation, NavigateFunction } from 'react-router-dom';
 import { RoutesPages } from '../../../pages/pages-types/pageTypes';
 
@@ -15,7 +16,11 @@ export default function ButtonCatalog() {
     <Button
       variant='contained'
       color='secondary'
-      disabled={location.pathname === RoutesPages.LOGIN.toString()}
+      endIcon={<StoreIcon />}
+      disabled={
+        location.pathname === RoutesPages.LOGIN.toString() ||
+        location.pathname === RoutesPages.CATALOG.toString()
+      }
       onClick={handleLoginClick}
     >
       Catalog
