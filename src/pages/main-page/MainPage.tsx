@@ -1,8 +1,14 @@
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, IconButton } from '@mui/material';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import Header from '../../components/header/Header';
 import './mainPage.scss';
 
 function MainPage() {
+  const handleCopyDiscount = async () => {
+    const textToCopy = 'rss-final';
+    await navigator.clipboard.writeText(textToCopy);
+  };
+
   return (
     <>
       <Header />
@@ -39,6 +45,18 @@ function MainPage() {
         <Typography variant='h6' gutterBottom sx={{ fontSize: { xs: '1.2rem', md: '2rem' } }}>
           Start exploring now and immerse yourself in the world of books!
         </Typography>
+        <div style={{ border: '1px dotted violet', padding: '10px', marginBottom: '40px' }}>
+          <h1 style={{ color: 'purple' }}>Get your discount to start to explore our book haven!</h1>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography color='secondary' variant='h5'>
+              rss-final
+            </Typography>
+            <IconButton color='default' onClick={handleCopyDiscount}>
+              <FileCopyIcon />
+            </IconButton>
+            <h3 style={{ marginLeft: '10px' }}>{'Discount of 1000 \u20AC to each new customer'}</h3>
+          </div>
+        </div>
       </Box>
     </>
   );

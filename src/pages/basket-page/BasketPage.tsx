@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable consistent-return */
 import { useEffect, useState } from 'react';
 import './basket.scss';
 import {
@@ -16,9 +15,11 @@ import {
   Paper,
   CircularProgress,
   Backdrop,
+  TextField,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
+  AddDiscountToCart,
   ChangeItemQuantity,
   CreateCart,
   DeleteCart,
@@ -26,7 +27,6 @@ import {
   RemoveItemFromCart,
 } from '../../service/CartService';
 import Header from '../../components/header/Header';
-import { GetProductById } from '../../service/ProductService';
 import SimpleSnackbar from '../../components/SimpleSnackbar/SimpleSnackbar';
 import ButtonCatalog from '../../components/buttons/button-catalog/ButtonCatalog';
 
@@ -41,18 +41,38 @@ interface LineItemType {
     value: { currencyCode: string; centAmount: number; fractionDigits: number };
   };
   totalPrice: { currencyCode: string; centAmount: number; fractionDigits: number };
+  variant: {
+    images: ImageType[];
+  };
+}
+
+interface ImageType {
+  url: string;
 }
 
 interface CartData {
   totalLineItemQuantity: number;
   totalPrice: { type: string; currencyCode: string; centAmount: number; fractionDigits: number };
-  lineItems: LineItemType[];
+  lineItems?: LineItemType[];
+  discountOnTotalPrice: {
+    discountedAmount: {
+      centAmount: number;
+    };
+  };
 }
 
 function BasketPage() {
+  const initialCarData = {
+    totalLineItemQuantity: 0,
+    totalPrice: { type: '', currencyCode: '', centAmount: 0, fractionDigits: 0 },
+    discountOnTotalPrice: {
+      discountedAmount: {
+        centAmount: 0,
+      },
+    },
+  };
   const [cartItems, setCartItems] = useState<LineItemType[]>([]);
-  const [cartData, setCartData] = useState<CartData | null>(null);
-  const [images, setImages] = useState<string[]>([]);
+  const [cartData, setCartData] = useState<CartData>(initialCarData);
   const [loading, setLoading] = useState(false);
   const [deleteProductSnackbarNeeded, setDeleteProductSnackbarNeeded] = useState(false);
   const [emptyCart, setEmptyCart] = useState(false);
@@ -82,40 +102,6 @@ function BasketPage() {
     getCart();
   }, []);
 
-  const fetchProductDetails = async (productId: string) => {
-    try {
-      const productDetails = await GetProductById(productId);
-      if (productDetails) {
-        return productDetails;
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Error fetching product details:', err);
-    }
-  };
-
-  const getItemsWithImages = async () => {
-    let items: string[] = [];
-    try {
-      const productPromises = cartItems.map((item) => fetchProductDetails(item.productId));
-      const products = await Promise.all(productPromises);
-      items = products
-        .map((product) => product?.images[0])
-        .filter((image): image is string => !!image);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Error fetching product images:', err);
-    }
-    return items;
-  };
-
-  useEffect(() => {
-    getItemsWithImages().then((items) => {
-      setImages(items);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartItems]);
-
   const incrementQuantity = async (id: string, quantity: number) => {
     setCartItems(
       cartItems.map((product) =>
@@ -125,7 +111,7 @@ function BasketPage() {
 
     const response: CartData | undefined = await ChangeItemQuantity(id, quantity + 1);
     if (response) {
-      setCartItems(response.lineItems);
+      setCartItems(response.lineItems!);
       setCartData(response);
     }
   };
@@ -139,7 +125,7 @@ function BasketPage() {
 
     const response: CartData | undefined = await ChangeItemQuantity(id, quantity - 1);
     if (response) {
-      setCartItems(response.lineItems);
+      setCartItems(response.lineItems!);
       setCartData(response);
     }
   };
@@ -166,6 +152,23 @@ function BasketPage() {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Error deleting cart:', err);
+    }
+  };
+
+  const [discountApplied, setDiscountApplied] = useState<boolean>(false);
+  const [inactiveDiscount, setInactiveDiscount] = useState<boolean>(false);
+  const [promoValue, setPromoValue] = useState<string>('');
+  const handlePromoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPromoValue(event.target.value);
+  };
+
+  const handlePromoClick = async () => {
+    if (promoValue === 'rss-final') {
+      const discountedCartData = await AddDiscountToCart(promoValue);
+      setCartData(discountedCartData);
+      setDiscountApplied(true);
+    } else {
+      setInactiveDiscount(true);
     }
   };
 
@@ -243,8 +246,8 @@ function BasketPage() {
                     minWidth: 850,
                   }}
                 >
-                  <TableHead className='cell'>
-                    <TableRow className='cell'>
+                  <TableHead>
+                    <TableRow>
                       <TableCell>Product</TableCell>
                       <TableCell>Price</TableCell>
                       <TableCell align='center'>Quantity</TableCell>
@@ -252,21 +255,20 @@ function BasketPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {cartItems.map((product, index) => (
-                      <TableRow className='cell' key={product.id}>
+                    {cartItems.map((product) => (
+                      <TableRow key={product.id}>
                         <TableCell>
                           <img
-                            src={images[index]}
+                            src={product.variant.images[0]?.url}
                             alt={product.name['en-US']}
                             style={{ width: '50px', margin: '10px', float: 'left' }}
                           />
                           <span>{product.name['en-US']}</span>
                         </TableCell>
                         <TableCell className='cell'>
-                          {product.price.value.centAmount} {product.price.value.currencyCode}
+                          {`\u20AC${product.price.value.centAmount}`}
                         </TableCell>
                         <TableCell
-                          className='cell'
                           style={{ height: '128.5px', display: 'flex', alignItems: 'center' }}
                         >
                           <Button
@@ -284,10 +286,9 @@ function BasketPage() {
                           </Button>
                         </TableCell>
                         <TableCell className='cell'>
-                          {product.totalPrice.centAmount} {product.totalPrice.currencyCode}
+                          {`\u20AC${product.totalPrice.centAmount}`}
                         </TableCell>
                         <TableCell
-                          className='cell'
                           style={{
                             border: 'none',
                           }}
@@ -298,22 +299,66 @@ function BasketPage() {
                         </TableCell>
                       </TableRow>
                     ))}
-                    <TableRow className='cell'>
+                    <TableRow>
+                      <TableCell>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <TextField
+                            label='Enter promo code!'
+                            placeholder='Your promo code'
+                            onChange={handlePromoChange}
+                            variant='outlined'
+                            size='small'
+                            style={{ marginRight: '10px' }}
+                          />
+                          <Button
+                            size='medium'
+                            color='secondary'
+                            variant='contained'
+                            onClick={handlePromoClick}
+                          >
+                            Apply
+                          </Button>
+                        </div>
+                      </TableCell>
                       <TableCell align='right' colSpan={2}>
                         <h4>Total</h4>
                       </TableCell>
                       <TableCell align='center' colSpan={1}>
                         <h4>{cartData?.totalLineItemQuantity}</h4>
                       </TableCell>
-                      <TableCell
-                        style={{
-                          display: 'flex',
-                        }}
-                      >
-                        <h4>
-                          {cartData?.totalPrice.centAmount} {cartData?.totalPrice.currencyCode}
-                        </h4>
-                      </TableCell>
+                      {discountApplied ? (
+                        <TableCell
+                          rowSpan={2}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'baseline',
+                          }}
+                        >
+                          <h4>{`\u20AC${cartData?.totalPrice.centAmount}`}</h4>
+                          <div>
+                            <p style={{ textDecoration: 'line-through', marginLeft: '10px' }}>
+                              {`\u20AC${
+                                cartData.totalPrice.centAmount +
+                                cartData.discountOnTotalPrice.discountedAmount.centAmount
+                              }`}
+                            </p>
+                            <p style={{ fontSize: '8px' }}>{'(Discount in 1000 \u20AC applied)'}</p>
+                          </div>
+                        </TableCell>
+                      ) : (
+                        <TableCell
+                          style={{
+                            display: 'flex',
+                          }}
+                        >
+                          <h4>{`\u20AC${cartData?.totalPrice.centAmount}`}</h4>
+                        </TableCell>
+                      )}
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -323,6 +368,13 @@ function BasketPage() {
         </Box>
         {deleteProductSnackbarNeeded && (
           <SimpleSnackbar colorName='success' text='Item deleted!' closeModal={snackbarClose} />
+        )}
+        {inactiveDiscount && (
+          <SimpleSnackbar
+            colorName='warning'
+            text='Sorry! This is no valid promo code!'
+            closeModal={snackbarClose}
+          />
         )}
       </Container>
       <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>

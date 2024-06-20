@@ -42,12 +42,16 @@ export default function AboutPage() {
               {/* Отебек поставь свою фотографию, если надо */}
               <CardContent sx={{ flex: '1 1 auto' }}>
                 <Typography variant='h4'>Otabek Mirzakhmedov</Typography>
-                <Typography variant='h5'>Фронтенд-разработчик</Typography>
+                <Typography variant='h5'>Software-developer</Typography>
                 <Typography variant='body1' marginBottom='20px'>
-                  Краткая биография о...
+                  He graduated from Turin Polytechnic University in Tashkent.
                 </Typography>
                 <Typography variant='h5'>Contribution</Typography>
-                <Typography variant='body1'>Something...</Typography>
+                <Typography variant='body1'>
+                  He helped a team as a teamleader to overcome difficulties with understanding the
+                  commerstools, created Catalog, Category, Main pages, configured commerstools,
+                  vite, postman for project.
+                </Typography>
               </CardContent>
               <CardActions>
                 <Link

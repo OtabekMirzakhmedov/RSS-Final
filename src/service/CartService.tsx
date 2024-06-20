@@ -10,6 +10,11 @@ export interface Cart {
   lineItems: LineItem[];
   totalPrice: { type: string; currencyCode: string; centAmount: number; fractionDigits: number };
   totalLineItemQuantity: number;
+  discountOnTotalPrice: {
+    discountedAmount: {
+      centAmount: number;
+    };
+  };
 }
 
 interface LineItem {
@@ -23,6 +28,13 @@ interface LineItem {
     value: { currencyCode: string; centAmount: number; fractionDigits: number };
   };
   totalPrice: { currencyCode: string; centAmount: number; fractionDigits: number };
+  variant: {
+    images: ImageType[];
+  };
+}
+
+interface ImageType {
+  url: string;
 }
 
 export const CreateCart = async (): Promise<Cart> => {
@@ -277,6 +289,48 @@ export const DeleteCart = async (): Promise<Cart> => {
     return cartData;
   } catch (error) {
     console.error('Error creating cart:', error);
+    throw error;
+  }
+};
+
+export const AddDiscountToCart = async (promoValue: string): Promise<Cart> => {
+  const initialToken = localStorage.getItem('initial_token');
+  const token = localStorage.getItem('token');
+  let tokenValue = `Bearer ${initialToken}`;
+  if (token) {
+    tokenValue = `Bearer ${token}`;
+  }
+
+  const cartId = localStorage.getItem('cartId')!;
+  const cartVersion = localStorage.getItem('cartVersion')!;
+
+  const url = `${host}/${projectKey}/me/carts/${cartId}`;
+
+  try {
+    const response = await axios.post<Cart>(
+      url,
+      {
+        version: parseInt(cartVersion, 10),
+        actions: [
+          {
+            action: 'addDiscountCode',
+            code: promoValue,
+          },
+        ],
+      },
+      {
+        headers: {
+          Authorization: tokenValue,
+        },
+      }
+    );
+
+    const cartData = response.data;
+    localStorage.setItem('cartId', cartData.id);
+    localStorage.setItem('cartVersion', cartData.version.toString());
+    return cartData;
+  } catch (error) {
+    console.error('Error adding discount to cart:', error);
     throw error;
   }
 };
