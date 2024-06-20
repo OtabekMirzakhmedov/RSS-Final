@@ -40,7 +40,7 @@ function CatalogPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [sortOption, setSortOption] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [triggerSearch, setTriggerSearch] = useState<number>(0); // New state for search trigger
+  const [triggerSearch, setTriggerSearch] = useState<number>(0);
   const [addingToCart, setAddingToCart] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>('');
   const navigate: NavigateFunction = useNavigate();
